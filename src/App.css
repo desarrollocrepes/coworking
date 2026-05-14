@@ -1,0 +1,38 @@
+:root {
+    --primary: #2563eb; --primary-hover: #1d4ed8; --primary-light: #eff6ff;
+    --text-main: #1f2937; --text-muted: #6b7280; --bg-main: #f8fafc;
+    --border-color: #e2e8f0; --danger: #ef4444; --danger-light: #fef2f2;
+    --success: #10b981; --warning: #f59e0b;
+    --font-sans: system-ui, -apple-system, sans-serif;
+  }
+  body { margin: 0; padding: 0; background-color: var(--bg-main); color: var(--text-main); font-family: var(--font-sans); }
+  .cw-app { min-height: 100vh; display: flex; flex-direction: column; }
+  .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.5rem; box-sizing: border-box; }
+  .container-sm { max-width: 800px; }
+  .flex-center { display: flex; align-items: center; justify-content: center; }
+  .flex-between { display: flex; align-items: center; justify-content: space-between; }
+  .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; }
+  .spin { animation: spin 1s linear infinite; }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  
+  /* Alertas Globales */
+  .alert { padding: 0.75rem 1rem; border-radius: 0.5rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.9rem; }
+  .alert-danger { background-color: var(--danger-light); color: #b91c1c; border: 1px solid #fecaca; }
+  
+  /* Utilidades posicionales */
+  .overlay-loader { position: absolute; inset: 0; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; z-index: 20; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-content { background: white; border-radius: 1rem; padding: 1.5rem; width: 100%; max-width: 400px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; }
+  
+  /* Botones Globales (Opcional mover a Button.css) */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; outline: none; font-size: 0.95rem; }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-primary { background-color: var(--primary); color: white; }
+  .btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
+  .btn-secondary { background-color: white; color: var(--text-main); border-color: #d1d5db; }
+  .btn-secondary:hover:not(:disabled) { background-color: #f9fafb; }
+  .btn-danger { background-color: var(--danger-light); color: var(--danger); border-color: #fecaca; }
+  .btn-w-full { width: 100%; }
+  .btn-icon-only { padding: 0.5rem; background: transparent; color: var(--text-muted); border-radius: 50%; border: none; cursor: pointer;}
+  .btn-icon-only:hover { background-color: #f3f4f6; color: var(--text-main); }
