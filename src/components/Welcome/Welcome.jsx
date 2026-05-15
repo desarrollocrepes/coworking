@@ -3,120 +3,98 @@ import { Info, CheckCircle, RefreshCw, Calendar, MapPin, MapPinOff, Loader2, Che
 import Button from '../Shared/Button';
 import './Welcome.css';
 
+const API_URL = 'https://macfer.crepesywaffles.com/api/working-politicas';
+
 const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) => {
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [policiesChecked, setPoliciesChecked] = useState(false);
-  const [userAcceptedPolicies, setUserAcceptedPolicies] = useState(policiesAccepted);
+  const [error, setError] = useState('');
+  const [now, setNow] = useState(new Date());
+  const [checked, setChecked] = useState(false);
+  const [accepted, setAccepted] = useState(policiesAccepted);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    const checkPolicies = async () => {
-      try {
-        const res = await fetch(
-          `https://macfer.crepesywaffles.com/api/working-politicas?filters[documento][$eq]=${userData.cedula}`
-        );
-        if (res.ok) {
-          const data = await res.json();
-          if (data.data && data.data.length > 0) {
-            setUserAcceptedPolicies(true);
-            onAcceptPolicies();
-          }
-        }
-      } catch (err) {
-        console.error('Error verificando políticas:', err);
-      } finally {
-        setPoliciesChecked(true);
-      }
-    };
-
-    if (userData?.cedula) {
-      checkPolicies();
-    }
+    if (!userData?.cedula) return;
+    fetch(`${API_URL}?filters[documento][$eq]=${userData.cedula}`)
+      .then(r => r.json())
+      .then(d => { if (d.data?.length) { setAccepted(true); onAcceptPolicies(); } })
+      .catch(console.error)
+      .finally(() => setChecked(true));
   }, [userData?.cedula, onAcceptPolicies]);
 
-  const handleAccept = async () => {
-    setLoading(true); 
-    setErrorMsg('');
-    try {
-      const res = await fetch('https://macfer.crepesywaffles.com/api/working-politicas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          data: {
-            documento: userData.cedula, 
-            acepto: true 
-          }
-        })
-      });
-      if(!res.ok) throw new Error('No se pudieron registrar las políticas');
-      setUserAcceptedPolicies(true);
-      onAcceptPolicies();
-    } catch(err) { 
-      setErrorMsg('Error al guardar tu confirmación.'); 
-      console.error(err);
-    } 
-    finally { 
-      setLoading(false); 
-    }
+  const handleAccept = () => {
+    setLoading(true); setError('');
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: { documento: userData.cedula, acepto: true } })
+    })
+      .then(r => { if (!r.ok) throw new Error(); setAccepted(true); onAcceptPolicies(); })
+      .catch(() => setError('Error al guardar tu confirmación.'))
+      .finally(() => setLoading(false));
   };
 
+  const policies = [
+    { Icon: CheckCircle, t: 'Una reserva por día', d: 'Solo se permite 1 reserva activa por día (pendiente o confirmada)' },
+    { Icon: RefreshCw, t: 'Rotación de puesto', d: 'No puedes usar el mismo puesto en días consecutivos' },
+    { Icon: Calendar, t: 'Horarios de reserva', d: 'Las reservas están habilitadas en días hábiles' },
+    { Icon: MapPin, t: 'Confirmación en 15 minutos', d: 'Debes confirmar el mismo día dentro de los 15 min de tu turno, en un perímetro de 1000m' },
+    { Icon: MapPinOff, t: 'Sin GPS disponible', d: 'Si tu dispositivo no permite ubicación, acude a recepción para confirmar', danger: true }
+  ];
+
   return (
-    <div className="container container-sm" style={{paddingTop: '2rem'}}>
+    <div className="container" style={{ paddingTop: '2rem' }}>
       <div className="welcome-card">
         <div className="profile-section">
           <img src={userData.photo} alt={userData.name} className="profile-pic" />
           <div className="profile-details">
-            <h2>¡Hola, {userData.name}!</h2>
-            <p className="subtitle">Bienvenido a tu espacio de trabajo</p>
-            <p className="role">{userData.role} • {userData.department}</p>
+            <h2>¡Hola, {userData.name.split(' ')[0]}!</h2>
+            <p className="role">{userData.role}</p>
           </div>
         </div>
         <div className="time-widget">
-          <p className="date">{currentTime.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-          <p className="time">{currentTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
+          <p className="date">{now.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p className="time">{now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
         </div>
       </div>
 
-      {!policiesChecked ? (
+      {!checked ? (
         <div className="policy-box">
-          <div className="flex-center" style={{padding: '2rem', gap: '1rem'}}>
-            <Loader2 className="spin" size={24} />
-            <p>Verificando políticas...</p>
-          </div>
+          <div className="flex-center" style={{ padding: '2rem', gap: '1rem' }}><Loader2 className="spin" size={24} /><p>Verificando políticas...</p></div>
         </div>
-      ) : !userAcceptedPolicies ? (
+      ) : !accepted ? (
         <div className="policy-box">
-          <div className="policy-header"><Info color="var(--primary)" size={24} /> Políticas de reserva</div>
+          <div className="policy-header">Políticas de reserva</div>
           <div className="policy-body">
-            <p style={{marginBottom: '1.5rem', fontWeight: 500}}>Lee las condiciones antes de continuar:</p>
+            <p style={{ marginBottom: '1.5rem', fontWeight: 500 }}>Lee las condiciones antes de continuar:</p>
             <ul className="policy-list">
-              <li className="policy-item"><div className="policy-icon"><CheckCircle size={20} /></div><div className="policy-text-block"><strong>Una reserva por día</strong>Solo se permite 1 reserva activa por día (pendiente o confirmada)</div></li>
-              <li className="policy-item"><div className="policy-icon"><RefreshCw size={20} /></div><div className="policy-text-block"><strong>Rotación de puesto</strong>No puedes usar el mismo puesto en días consecutivos</div></li>
-              <li className="policy-item"><div className="policy-icon"><Calendar size={20} /></div><div className="policy-text-block"><strong>Horarios de reserva</strong>Las reservas están habilitadas en días hábiles</div></li>
-              <li className="policy-item"><div className="policy-icon"><MapPin size={20} /></div><div className="policy-text-block"><strong>Confirmación en 15 minutos</strong>Debes confirmar el mismo día dentro de los 15 min de tu turno, en un perímetro de 1000m</div></li>
-              <li className="policy-item"><div className="policy-icon danger"><MapPinOff size={20} /></div><div className="policy-text-block"><strong>Sin GPS disponible</strong>Si tu dispositivo no permite ubicación, acude a recepción para confirmar</div></li>
+              {policies.map(({ Icon, t, d, danger }, i) => (
+                <li key={i} className="policy-item">
+                  <div className={`policy-icon ${danger ? 'danger' : ''}`}><Icon size={20} /></div>
+                  <div className="policy-text-block"><strong>{t}</strong>{d}</div>
+                </li>
+              ))}
             </ul>
-            {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
+            {error && <div className="alert alert-danger">{error}</div>}
             <div className="policy-footer">
-              <Button disabled={loading} onClick={handleAccept} className="btn-w-full" style={{maxWidth: '300px'}}>
-                {loading ? <Loader2 className="spin" size={18} /> : 'He leído y acepto las políticas'} 
+              <Button disabled={loading} onClick={handleAccept} className="btn-w-full" style={{ maxWidth: '300px' }}>
+                {loading ? <Loader2 className="spin" size={18} /> : 'He leído y acepto las políticas'}
               </Button>
             </div>
           </div>
         </div>
       ) : (
-        <div className="policy-box flex-between" style={{padding: '1.5rem', flexWrap: 'wrap', gap: '1rem'}}>
-           <div className="flex-center gap-3">
-              <div style={{background: '#d1fae5', color: '#059669', padding: '0.5rem', borderRadius: '50%'}}><CheckCircle size={24} /></div>
-              <div><h3 style={{margin: '0 0 0.25rem'}}>Políticas Aceptadas</h3><p style={{margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)'}}>Ya has confirmado los términos del Co-Working.</p></div>
-           </div>
-           <Button onClick={onContinue}>Continuar a Salas <ChevronLeft style={{transform: 'rotate(180deg)'}} size={18} /></Button>
+        <div className="policy-box flex-between" style={{ padding: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div className="flex-center gap-3">
+            <div>
+              <h3 style={{ margin: '0 0 0.25rem' }}>Ya has confirmado las Políticas de Reserva del Co-Working</h3>
+            </div>
+          </div>
+          <Button onClick={onContinue}>Continuar a Salas <ChevronLeft style={{ transform: 'rotate(180deg)' }} size={18} /></Button>
         </div>
       )}
     </div>

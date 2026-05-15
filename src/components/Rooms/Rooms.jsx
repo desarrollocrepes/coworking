@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Monitor, ChevronLeft, Loader2 } from 'lucide-react';
+import { User, Monitor, ChevronLeft, Loader2, Armchair } from 'lucide-react';
 import './Rooms.css';
 
 const BASE = 'https://macfer.crepesywaffles.com';
@@ -64,7 +64,7 @@ const Rooms = ({ onSelectRoom }) => {
             </div>
             <div className="room-info">
               <div className="room-features">
-                <p><User size={18} color="var(--primary)" /> <strong>{sala.capacidad || 0} puestos</strong></p>
+                <p><Armchair size={18} color="var(--primary)" /> <strong>{sala.capacidad || 0} puestos</strong></p>
                 <p><Monitor size={18} color="var(--primary)" /> <span>{sala.monitores || 0} con monitor</span></p>
               </div>
               <div className="room-action-icon"><ChevronLeft style={{transform: 'rotate(180deg)'}} size={24} /></div>
