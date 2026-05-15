@@ -14,17 +14,17 @@ const Login = ({ onLoginSuccess }) => {
     setLoading(true); setErrorMsg('');
     try {
       const res = await fetch(`https://apialohav2.crepesywaffles.com/buk/empleados3?documento=${cedula}`);
-      if (!res.ok) throw new Error('Error de conexión con el sistema');
+      if (!res.ok) throw new Error('Error de conexión');
       const data = await res.json();
-      const empleado = Array.isArray(data) ? data[0] : (data.data || data);
-
+      let empleado = Array.isArray(data) ? data[0] : (data.data ? (Array.isArray(data.data) ? data.data[0] : data.data) : data);
+      
       if (!empleado) throw new Error('Empleado no encontrado.');
-      if (empleado.estado === 'Inactivo' || empleado.estado === 'Retirado' || empleado.activo === false) {
-         throw new Error('Usuario inactivo. No tienes permisos para ingresar.');
+      if (empleado.status && empleado.status.toLowerCase() === 'inactivo') {
+        throw new Error('Usuario inactivo');
       }
 
       const userData = {
-        name: empleado.nombres ? `${empleado.nombres} ${empleado.apellidos || ''}` : empleado.nombre || 'Colaborador',
+        name: empleado.nombre ? `${empleado.nombre} ${empleado.apellidos || ''}` : empleado.nombre || 'Colaborador',
         role: empleado.cargo || 'Staff',
         department: empleado.area || empleado.departamento || 'General',
         photo: empleado.foto || empleado.url_foto || `https://ui-avatars.com/api/?name=${empleado.nombres || 'U'}&background=2563eb&color=fff`,

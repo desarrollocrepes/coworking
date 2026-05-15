@@ -2,20 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { User, Monitor, ChevronLeft, Loader2 } from 'lucide-react';
 import './Rooms.css';
 
+const BASE = 'https://macfer.crepesywaffles.com';
+
 const Rooms = ({ onSelectRoom }) => {
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Normaliza una sala desde la API
+  const normalizeSala = (item) => {
+    const a = item.attributes ?? item;
+    let imagenUrl = null;
+    const fotoArr = a.foto?.data;
+    
+    if (Array.isArray(fotoArr) && fotoArr.length > 0) {
+      const url = fotoArr[0].attributes?.url;
+      if (url) imagenUrl = url.startsWith('http') ? url : `${BASE}${url}`;
+    }
+
+    return {
+      id: item.id,
+      nombre: a.nombre ?? `Sala ${item.id}`,
+      capacidad: a.capacidad ?? 0,
+      monitores: a.monitores ?? 0,
+      imagen: imagenUrl,
+    };
+  };
+
   useEffect(() => {
     const fetchSalas = async () => {
-      setLoading(true); setErrorMsg('');
+      setLoading(true); 
+      setErrorMsg('');
       try {
-        const res = await fetch('https://macfer.crepesywaffles.com/api/working-salas');
+        const res = await fetch(`${BASE}/api/working-salas?populate=foto`);
         if(!res.ok) throw new Error('Error al cargar salas');
-        const data = await res.json();
-        setSalas(Array.isArray(data) ? data : []);
-      } catch (err) { setErrorMsg('No se pudieron cargar las salas disponibles.'); } 
+        const response = await res.json();
+        const salasNormalizadas = (response.data || []).map(normalizeSala);
+        setSalas(salasNormalizadas);
+      } catch (err) { 
+        setErrorMsg('No se pudieron cargar las salas disponibles.'); 
+      } 
       finally { setLoading(false); }
     };
     fetchSalas();
@@ -30,16 +56,16 @@ const Rooms = ({ onSelectRoom }) => {
       {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
       <div className="rooms-grid">
         {salas.map((sala) => (
-          <div key={sala.id} onClick={() => onSelectRoom({ ...sala, capacity: sala.capacidad || 6, withMonitor: sala.con_monitor || [] })} className="room-card">
+          <div key={sala.id} onClick={() => onSelectRoom(sala)} className="room-card">
             <div className="room-img-container">
-              <img src={sala.imagen || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80'} alt={sala.nombre} className="room-img" />
+              <img src={sala.imagen} alt={sala.nombre} className="room-img" />
               <div className="room-overlay"></div>
               <h3 className="room-title">{sala.nombre}</h3>
             </div>
             <div className="room-info">
               <div className="room-features">
                 <p><User size={18} color="var(--primary)" /> <strong>{sala.capacidad || 0} puestos</strong></p>
-                <p><Monitor size={18} color="var(--primary)" /> <span>{(sala.con_monitor || []).length} con monitor</span></p>
+                <p><Monitor size={18} color="var(--primary)" /> <span>{sala.monitores || 0} con monitor</span></p>
               </div>
               <div className="room-action-icon"><ChevronLeft style={{transform: 'rotate(180deg)'}} size={24} /></div>
             </div>

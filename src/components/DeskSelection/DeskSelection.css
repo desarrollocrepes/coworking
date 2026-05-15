@@ -11,6 +11,15 @@
   .table-surface { position: absolute; inset: 0; background-color: #fffbeb; border-radius: 40px; border: 8px solid rgba(120,53,15,0.1); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; z-index: 0; }
   .table-surface-inner { position: absolute; inset: 2rem; border: 1px solid rgba(120,53,15,0.05); border-radius: 24px; }
   .table-label { color: rgba(120,53,15,0.2); font-weight: bold; font-size: 2rem; text-transform: uppercase; letter-spacing: 0.1em; text-align: center;}
+  
+
+
+  /*CLAUDE 2 LINES*/
+  .table-image { width: 100%; height: auto; object-fit: contain; }
+  .chair-image { width: 8rem; height: 8rem; object-fit: contain; }
+  
+  
+  
   .desk-node { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; cursor: pointer; z-index: 10; transition: transform 0.2s; }
   .desk-node:hover:not(.occupied) { transform: scale(1.1); }
   .desk-node.top { top: 0; transform: translate(-50%, -60%); }
@@ -27,5 +36,4 @@
   .sidebar-desk-info p { margin: 0; }
   .sidebar-desk-info .title { font-weight: 500; display: flex; align-items: center; gap: 0.25rem; font-size: 0.95rem; }
   .sidebar-desk-info .status { font-size: 0.8rem; color: var(--text-muted); }
-  .form-select { width: 100%; padding: 0.8rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-family: inherit; font-size: 0.95rem; margin-bottom: 1rem; outline: none; }
   @media (min-width: 1024px) { .desk-layout { flex-direction: row; } .desk-sidebar { width: 320px; height: calc(100vh - 140px); } .sidebar-body { max-height: none; flex: 1; } }

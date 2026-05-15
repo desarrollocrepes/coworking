@@ -7,24 +7,63 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [policiesChecked, setPoliciesChecked] = useState(false);
+  const [userAcceptedPolicies, setUserAcceptedPolicies] = useState(policiesAccepted);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const checkPolicies = async () => {
+      try {
+        const res = await fetch(
+          `https://macfer.crepesywaffles.com/api/working-politicas?filters[documento][$eq]=${userData.cedula}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data.data && data.data.length > 0) {
+            setUserAcceptedPolicies(true);
+            onAcceptPolicies();
+          }
+        }
+      } catch (err) {
+        console.error('Error verificando políticas:', err);
+      } finally {
+        setPoliciesChecked(true);
+      }
+    };
+
+    if (userData?.cedula) {
+      checkPolicies();
+    }
+  }, [userData?.cedula, onAcceptPolicies]);
+
   const handleAccept = async () => {
-    setLoading(true); setErrorMsg('');
+    setLoading(true); 
+    setErrorMsg('');
     try {
       const res = await fetch('https://macfer.crepesywaffles.com/api/working-politicas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documento: userData.cedula, aceptadas: true, fecha: new Date().toISOString() })
+        body: JSON.stringify({ 
+          data: {
+            documento: userData.cedula, 
+            acepto: true 
+          }
+        })
       });
       if(!res.ok) throw new Error('No se pudieron registrar las políticas');
+      setUserAcceptedPolicies(true);
       onAcceptPolicies();
-    } catch(err) { setErrorMsg('Error al guardar tu confirmación.'); } 
-    finally { setLoading(false); }
+    } catch(err) { 
+      setErrorMsg('Error al guardar tu confirmación.'); 
+      console.error(err);
+    } 
+    finally { 
+      setLoading(false); 
+    }
   };
 
   return (
@@ -44,7 +83,14 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
         </div>
       </div>
 
-      {!policiesAccepted ? (
+      {!policiesChecked ? (
+        <div className="policy-box">
+          <div className="flex-center" style={{padding: '2rem', gap: '1rem'}}>
+            <Loader2 className="spin" size={24} />
+            <p>Verificando políticas...</p>
+          </div>
+        </div>
+      ) : !userAcceptedPolicies ? (
         <div className="policy-box">
           <div className="policy-header"><Info color="var(--primary)" size={24} /> Políticas de reserva</div>
           <div className="policy-body">
