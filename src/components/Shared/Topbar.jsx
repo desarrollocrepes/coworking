@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, LogOut, Tickets } from 'lucide-react';
+import { ChevronLeft, LogOut, Tickets, Shield } from 'lucide-react';
 import './Topbar.css';
 
 const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
@@ -15,16 +15,23 @@ const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
         <img src={userData.photo} alt="Perfil" className="user-avatar" />
         <div className="user-info-text">
           <p>{userData.name.split(' ')[0]}</p>
-          <span>{userData.cedula}</span>
+          <span>{userData.cedula}
+          </span>
         </div>
       </div>
     </div>
 
     {userData && (
       <div className="topbar-right">
-        <button onClick={() => onNavigate('myReservations')} className="nav-link" title="Mis reservas">
-          <Tickets size={18} /> 
-          <span className="nav-text">Mis reservas</span>
+        {/* El texto cambia dinámicamente dependiendo si es admin o no */}
+        <button 
+          onClick={() => onNavigate('myReservations')} 
+          className="nav-link" 
+          title={userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
+        >
+          <span className="nav-text">
+            {userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
+          </span>
         </button>
         
         <button onClick={onLogout} className="btn-icon-only logout-btn" title="Cerrar sesión">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle, Loader2, IdCard, Sofa } from 'lucide-react';
+import { Loader2, IdCard, Briefcase } from 'lucide-react';
 import Button from '../Shared/Button';
 import './Login.css';
 
@@ -24,13 +24,13 @@ const Login = ({ onLoginSuccess }) => {
       const emp = Array.isArray(data) ? data[0] : (data?.data?.[0] || data?.data || data);
 
       if (!emp) throw new Error('Empleado no encontrado');
-      if (emp.status?.trim().toLowerCase() !== 'activo') throw new Error('Usuario inactivo');
+      if (emp.status?.trim().toLowerCase() !== 'activo') throw new Error('Empleado no encontrado o inactivo');
 
       const userData = {
-        name: emp.nombre ? `${emp.nombre} ${emp.apellidos || ''}`.trim() : (emp.nombres || 'Colaborador'),
-        role: emp.cargo || 'Staff',
-        department: emp.area || emp.departamento || 'General',
-        photo: emp.foto || emp.url_foto || `https://ui-avatars.com/api/?name=${emp.nombre || 'U'}&background=2563eb&color=fff`,
+        name: emp.nombre ? `${emp.nombre} ${emp.apellidos || ''}`.trim() : (emp.nombres || ''),
+        role: emp.cargo || '',
+        department: emp.area || emp.departamento || '',
+        photo: emp.foto || emp.url_foto || `https://ui-avatars.com/api/?name=${emp.nombre || ''}&background=2563eb&color=fff`,
         isAdmin: ADMIN_CEDULAS.includes(String(cleanCedula)),
         cedula: cleanCedula
       };
@@ -54,14 +54,14 @@ const Login = ({ onLoginSuccess }) => {
     <div className="login-wrapper">
       <div className="login-card">
         <div className="login-header">
-          <Sofa size={48} style={{ margin: '0 auto', opacity: 0.9 }} />
+          <Briefcase size={48} style={{ margin: '0 auto', opacity: 0.9 }} />
           <h2>¡Bienvenido a nuestro espacio de Co-Working!</h2>
         </div>
 
         <form onSubmit={handleLogin} className="login-body">
           {errorMsg && (
             <div className="alert alert-danger">
-              <AlertTriangle size={18} /> <span>{errorMsg}</span>
+              <span>{errorMsg}</span>
             </div>
           )}
 

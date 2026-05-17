@@ -70,6 +70,7 @@
   border: 1px solid var(--border-color);
   overflow: hidden;
 }
+
 .policy-header {
   background: var(--bg-main);
   padding: 1rem 1.5rem;
@@ -80,48 +81,49 @@
   font-weight: bold;
   font-size: 1.1rem;
 }
+
 .policy-body {
   padding: 1.5rem;
+  padding-top: 0;
 }
+
 .policy-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1rem 0;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
+
 .policy-item {
   display: flex;
   gap: 1rem;
 }
+
 .policy-icon {
-  background: var(--primary-light);
   color: var(--primary);
   padding: 0.5rem;
-  border-radius: 0.5rem;
   height: max-content;
 }
-.policy-icon.danger {
-  background: var(--danger-light);
-  color: var(--danger);
-}
+
 .policy-text-block strong {
   display: block;
   color: var(--text-main);
-  margin-bottom: 0.25rem;
 }
+
 .policy-text-block {
   color: var(--text-muted);
   font-size: 0.95rem;
-  line-height: 1.4;
 }
+
 .policy-footer {
-  padding-top: 1.5rem;
+  padding-top: 0.5rem;
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
 }
+
 @media (min-width: 640px) {
   .welcome-card {
     flex-direction: row;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Info, CheckCircle, RefreshCw, Calendar, MapPin, MapPinOff, Loader2, ChevronLeft } from 'lucide-react';
+import { CheckCircle, RefreshCw, Calendar, MapPin, MapPinOff, Loader2, ChevronLeft, Smile } from 'lucide-react';
 import Button from '../Shared/Button';
 import './Welcome.css';
 
@@ -38,6 +38,14 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
       .finally(() => setLoading(false));
   };
 
+  // Función para determinar el saludo según la hora actual
+  const getGreeting = () => {
+    const hour = now.getHours();
+    if (hour < 12) return '¡Buenos días';
+    if (hour < 18) return '¡Buenas tardes';
+    return '¡Buenas noches';
+  };
+
   const policies = [
     { Icon: CheckCircle, t: 'Una reserva por día', d: 'Solo se permite 1 reserva activa por día (pendiente o confirmada)' },
     { Icon: RefreshCw, t: 'Rotación de puesto', d: 'No puedes usar el mismo puesto en días consecutivos' },
@@ -52,7 +60,7 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
         <div className="profile-section">
           <img src={userData.photo} alt={userData.name} className="profile-pic" />
           <div className="profile-details">
-            <h2>¡Hola, {userData.name}!</h2>
+            <h2>{getGreeting()}, {userData.name.split(' ')[0]}!</h2>
             <p className="role">{userData.cedula}</p>
           </div>
         </div>
