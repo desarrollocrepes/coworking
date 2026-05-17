@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronLeft, LogOut, Tickets } from 'lucide-react';
 import './Navbar.css';
 
-const navbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
+const Navbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
   <header className="navbar">
     <div className="navbar-left">
       {showBack && (
