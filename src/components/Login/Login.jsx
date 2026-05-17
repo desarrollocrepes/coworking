@@ -3,6 +3,8 @@ import { AlertTriangle, Loader2, IdCard, Sofa } from 'lucide-react';
 import Button from '../Shared/Button';
 import './Login.css';
 
+const ADMIN_CEDULAS = ["39792291", "52208899", "52932934", "1082244170", "1020759405", "1013106465", "1031610302"];
+
 const Login = ({ onLoginSuccess }) => {
   const [cedula, setCedula] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,7 +31,7 @@ const Login = ({ onLoginSuccess }) => {
         role: emp.cargo || 'Staff',
         department: emp.area || emp.departamento || 'General',
         photo: emp.foto || emp.url_foto || `https://ui-avatars.com/api/?name=${emp.nombre || 'U'}&background=2563eb&color=fff`,
-        isAdmin: !!emp.is_admin,
+        isAdmin: ADMIN_CEDULAS.includes(String(cleanCedula)),
         cedula: cleanCedula
       };
 
