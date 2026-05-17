@@ -1,10 +1,10 @@
 import React from 'react';
 import { ChevronLeft, LogOut, Tickets } from 'lucide-react';
-import './Navbar.css';
+import './Topbar.css';
 
-const Navbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
-  <header className="navbar">
-    <div className="navbar-left">
+const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
+  <header className="topbar">
+    <div className="topbar-left">
       {showBack && (
         <button onClick={onBack} className="btn-icon-only">
           <ChevronLeft size={24} />
@@ -21,7 +21,7 @@ const Navbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
     </div>
 
     {userData && (
-      <div className="navbar-right">
+      <div className="topbar-right">
         <button onClick={() => onNavigate('myReservations')} className="nav-link" title="Mis reservas">
           <Tickets size={20} /> 
           <span className="nav-text">Mis reservas</span>
@@ -35,4 +35,4 @@ const Navbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
   </header>
 );
 
-export default Navbar;
+export default Topbar;

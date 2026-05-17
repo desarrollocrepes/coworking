@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import './App.css';
-import Navbar from './components/Shared/Navbar';
+import Topbar from './components/Shared/Topbar';
 import Button from './components/Shared/Button';
 import Login from './components/Login/Login';
 import Welcome from './components/Welcome/Welcome';
@@ -43,7 +43,7 @@ export default function CoworkingApp() {
   return (
     <div className="cw-app">
       {currentView !== 'login' && (
-        <Navbar
+        <Topbar
           showBack={currentView === 'rooms' || currentView === 'deskSelection' || currentView === 'myReservations'}
           onBack={() => {
             if(currentView === 'myReservations' || currentView === 'rooms') setCurrentView('welcome');
