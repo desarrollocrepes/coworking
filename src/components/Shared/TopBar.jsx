@@ -4,7 +4,6 @@ import './Topbar.css';
 
 const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
   <header className="topbar">
-    {/* SECCIÓN IZQUIERDA: Atrás, Foto, Info */}
     <div className="topbar-left">
       {showBack && (
         <button onClick={onBack} className="btn-icon-only">
@@ -21,7 +20,6 @@ const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
       </div>
     </div>
 
-    {/* SECCIÓN DERECHA: Reservas y Salir */}
     {userData && (
       <div className="topbar-right">
         <button onClick={() => onNavigate('myReservations')} className="nav-link" title="Mis reservas">
