@@ -33,9 +33,9 @@ export default function CoworkingApp() {
   const getTitle = () => {
     switch(currentView) {
       case 'welcome': return 'Inicio';
-      case 'rooms': return 'Salas Disponibles';
+      case 'rooms': return 'Salas';
       case 'deskSelection': return `Reservar en ${selectedRoom?.nombre}`;
-      case 'myReservations': return userData?.isAdmin ? 'Todas las Reservas' : 'Mis Reservas';
+      case 'myReservations': return userData?.isAdmin ? 'Todas las reservas' : 'Mis reservas';
       default: return 'Coworking';
     }
   };

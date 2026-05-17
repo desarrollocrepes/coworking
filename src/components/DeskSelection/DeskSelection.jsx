@@ -83,7 +83,6 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
 
     setLoading(true); setErrorMsg('');
     try {
-      // Triple validación comprimida en bucle
       for (let i = 0; i < 3; i++) {
         const { data } = await fetch(`${API}/working-reservas?populate=*`).then(r => r.json());
         const dr = data.filter(r => getDeskId(r) === bookingDesk && r.attributes?.fecha_reserva === selectedDate);
@@ -111,6 +110,41 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
     <>
       <div className="container flex-1">
         <div className="desk-layout">
+          
+          {/* SIDEBAR MOVIDO A LA IZQUIERDA */}
+          <div className="desk-sidebar">
+            <div className="sidebar-header">Estado de escritorios</div>
+            <div className="sidebar-body">
+              {desks.map(id => {
+                const dr = getDeskR(id);
+                return (
+                  <div key={id} className="sidebar-item" style={{opacity: !canSelect(id) ? 0.5 : 1}}>
+                    <div className="sidebar-desk-info">
+                      <p className="title">Escritorio {id} {DESKS_MONITOR.includes(id) && <Monitor size={14} color="var(--primary)" />}</p>
+                      {dr.length > 0 && <div>
+                        {dr.map((r, i) => {
+                          const tName = horarios.find(h => h.id === getTurnoId(r))?.attributes?.nombre || 'Turno';
+                          const lbl = tName === 'Entrada' ? '🌅 AM' : tName === 'Salida' ? '🌆 PM' : tName === 'Completo' ? '☀️ Todo el día' : tName;
+                          return (
+                            <div key={i} style={{marginBottom:'0.5rem', padding:'0.5rem', background:'transparent', borderRadius:'4px', display:'flex', gap:'0.5rem'}}>
+                              {r.attributes?.foto && <img src={r.attributes.foto} alt="foto" style={{width:32, height:32, borderRadius:'50%', objectFit:'cover'}} />}
+                              <div style={{flex: 1, minWidth: 0}}>
+                                <strong style={{fontSize:'0.85rem', display:'block', overflow:'hidden', textOverflow:'ellipsis'}}>{getName(r)}</strong>
+                                <span style={{fontSize:'0.7rem', color:'#666', display:'block'}}>{lbl}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>}
+                      {!canSelect(id) && <p style={{fontSize: '0.75rem', color: 'var(--warning)'}}>Debes seleccionar otro escritorio</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ÁREA PRINCIPAL MOVIDA A LA DERECHA */}
           <div className="desk-main-area">
             {errorMsg && <div className="alert alert-danger flex-between"><span>{errorMsg}</span><button onClick={() => setErrorMsg('')} style={{background:'none', border:'none', cursor:'pointer'}}><AlertTriangle size={18}/></button></div>}
 
@@ -126,10 +160,18 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                 {isMorning && <span style={{fontSize: '0.85rem', color: 'var(--warning)'}}>⚠️ Horario restringido (madrugada)</span>}
               </div>
               <div className="legend-items">
-                <div className="flex-center gap-2"><span className="legend-dot" style={{background: 'var(--success)'}}/> Disponible</div>
-                <div className="flex-center gap-2"><span className="legend-dot" style={{background: 'var(--warning)'}}/> Medio Turno</div>
-                <div className="flex-center gap-2"><span className="legend-dot" style={{background: 'var(--danger)'}}/> Ocupado</div>
-                <div className="flex-center gap-2" style={{marginLeft: '0.5rem'}}><Monitor size={16}/> Esc: {DESKS_MONITOR.join(', ')}</div>
+                <div className="flex-center gap-2">
+                  <img src={chair1Img} alt="Disponible" style={{ width: '20px', height: 'auto' }} /> Disponible
+                </div>
+                <div className="flex-center gap-2">
+                  <img src={chair2Img} alt="Limitado" style={{ width: '20px', height: 'auto' }} /> Limitado
+                </div>
+                <div className="flex-center gap-2">
+                  <img src={chair3Img} alt="Ocupado" style={{ width: '20px', height: 'auto' }} /> Ocupado
+                </div>
+                <div className="flex-center gap-2" style={{marginLeft: '0.5rem'}}>
+                  <Monitor size={16}/> Con monitor
+                </div>
               </div>
             </div>
 
@@ -148,7 +190,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                       title={isRotDisabled ? 'Rotación: usado recientemente' : isOcc ? `Ocupado por: ${names}` : 'Disponible'}
                       onClick={() => !isOcc && canSelect(id) && setBookingDesk(id)}
                     >
-                      <img src={isOcc ? chair3Img : status.includes('limited') ? chair2Img : chair1Img} alt={`Silla ${id}`} className="chair-image" style={{cursor: isOcc || isRotDisabled ? 'not-allowed' : 'pointer', filter: isRotDisabled ? 'grayscale(1)' : 'none'}} />
+                      <img src={isOcc ? chair3Img : status.includes('limited') ? chair2Img : chair1Img} alt={`Silla ${id}`} className="chair-image" />
                     </div>
                   );
                 })}
@@ -156,38 +198,6 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
             </div>
           </div>
 
-          <div className="desk-sidebar">
-            <div className="sidebar-header">Estado de escritorios</div>
-            <div className="sidebar-body">
-              {desks.map(id => {
-                const status = getStatus(id), dr = getDeskR(id);
-                return (
-                  <div key={id} className="sidebar-item" style={{opacity: !canSelect(id) ? 0.5 : 1}}>
-                    <div className="sidebar-desk-info">
-                      <p className="title">Escritorio {id} {DESKS_MONITOR.includes(id) && <Monitor size={14} color="var(--primary)" />}</p>
-                      {dr.length > 0 && <div style={{marginTop: '0.5rem'}}>
-                        {dr.map((r, i) => {
-                          const tName = horarios.find(h => h.id === getTurnoId(r))?.attributes?.nombre || 'Turno';
-                          const lbl = tName === 'Entrada' ? '🌅 AM' : tName === 'Salida' ? '🌆 PM' : tName === 'Completo' ? '☀️ Todo el día' : tName;
-                          return (
-                            <div key={i} style={{marginBottom:'0.5rem', padding:'0.5rem', background:'transparent', borderRadius:'4px', display:'flex', gap:'0.5rem'}}>
-                              {r.attributes?.foto && <img src={r.attributes.foto} alt="foto" style={{width:32, height:32, borderRadius:'50%', objectFit:'cover'}} />}
-                              <div style={{flex: 1, minWidth: 0}}>
-                                <strong style={{fontSize:'0.85rem', display:'block', overflow:'hidden', textOverflow:'ellipsis'}}>{getName(r)}</strong>
-                                <span style={{fontSize:'0.7rem', color:'#666', display:'block'}}>{lbl}</span>
-                                {r.attributes?.area && <span style={{fontSize:'0.65rem', color:'#999', display:'block'}}>{r.attributes.area}</span>}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>}
-                      {!canSelect(id) && <p style={{fontSize: '0.75rem', color: 'var(--warning)'}}>⚠️ Rotación</p>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </div>
 

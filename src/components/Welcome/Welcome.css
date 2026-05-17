@@ -1,13 +1,14 @@
 .welcome-card {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   background: white;
   border-radius: 1rem;
   padding: 1.5rem;
-  gap: 1.5rem;
+  gap: 1rem;
   border: 1px solid var(--border-color);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .profile-section {
@@ -124,6 +125,7 @@
 @media (min-width: 640px) {
   .welcome-card {
     flex-direction: row;
+    justify-content: space-between;
     align-items: center;
   }
   .time-widget {

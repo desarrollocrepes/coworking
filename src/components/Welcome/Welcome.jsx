@@ -52,8 +52,8 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
         <div className="profile-section">
           <img src={userData.photo} alt={userData.name} className="profile-pic" />
           <div className="profile-details">
-            <h2>¡Hola, {userData.name.split(' ')[0]}!</h2>
-            <p className="role">{userData.role}</p>
+            <h2>¡Hola, {userData.name}!</h2>
+            <p className="role">{userData.cedula}</p>
           </div>
         </div>
         <div className="time-widget">
@@ -94,7 +94,7 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
               <h3 style={{ margin: '0 0 0.25rem' }}>Ya has confirmado las Políticas de Reserva del Co-Working</h3>
             </div>
           </div>
-          <Button onClick={onContinue}>Continuar a Salas <ChevronLeft style={{ transform: 'rotate(180deg)' }} size={18} /></Button>
+          <Button onClick={onContinue}>Continuar<ChevronLeft style={{ transform: 'rotate(180deg)' }} size={18} /></Button>
         </div>
       )}
     </div>
