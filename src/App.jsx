@@ -43,8 +43,7 @@ export default function CoworkingApp() {
   return (
     <div className="cw-app">
       {currentView !== 'login' && (
-        <navbar 
-          title={getTitle()} 
+        <Navbar
           showBack={currentView === 'rooms' || currentView === 'deskSelection' || currentView === 'myReservations'}
           onBack={() => {
             if(currentView === 'myReservations' || currentView === 'rooms') setCurrentView('welcome');
