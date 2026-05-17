@@ -24,7 +24,7 @@ export default function Rooms({ onSelectRoom }) {
     <div className="container flex-1">
       <div className="page-header">
         <div><h2>Elige tu sala</h2><p>Selecciona la sala para continuar con tu reserva.</p></div>
-        {loading && <Loader2 className="spin text-primary" size={28} color="var(--primary)" />}
+        {loading && <Loader2 className="spin text-primary" size={18} color="var(--primary)" />}
       </div>
       {err && <div className="alert alert-danger">{err}</div>}
       <div className="rooms-grid">
@@ -40,7 +40,7 @@ export default function Rooms({ onSelectRoom }) {
                 <p><Armchair size={18} color="var(--primary)" /> <strong>{s.capacidad || 0} puestos</strong></p>
                 <p><Monitor size={18} color="var(--primary)" /> <span>{s.monitores || 0} con monitor</span></p>
               </div>
-              <div className="room-action-icon"><ChevronRight size={24} /></div>
+              <div className="room-action-icon"><ChevronRight size={18} /></div>
             </div>
           </div>
         ))}

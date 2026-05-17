@@ -10,15 +10,27 @@ const MyReservations = ({ userData }) => {
 
   useEffect(() => {
     const fetchReservas = async () => {
-      setLoading(true); setErrorMsg('');
+      setLoading(true); 
+      setErrorMsg('');
       try {
-        const url = userData.isAdmin ? 'https://macfer.crepesywaffles.com/api/working-reservas' : `https://macfer.crepesywaffles.com/api/working-reservas?documento=${userData.cedula}`;
+        // Se actualizan las URLs para incluir populate=* y el filtro adecuado para Strapi
+        const baseUrl = 'https://macfer.crepesywaffles.com/api/working-reservas';
+        const url = userData.isAdmin 
+          ? `${baseUrl}?populate=*` 
+          : `${baseUrl}?filters[documento][$eq]=${userData.cedula}&populate=*`;
+          
         const res = await fetch(url);
         if(!res.ok) throw new Error('Error al cargar reservas');
-        const data = await res.json();
-        setReservas(Array.isArray(data) ? data : []);
-      } catch (err) { setErrorMsg('No se pudieron cargar las reservas.'); } 
-      finally { setLoading(false); }
+        
+        const json = await res.json();
+        // La data de Strapi viene dentro de la propiedad "data"
+        setReservas(Array.isArray(json.data) ? json.data : []);
+      } catch (err) { 
+        setErrorMsg('No se pudieron cargar las reservas.'); 
+      } 
+      finally { 
+        setLoading(false); 
+      }
     };
     if (userData?.cedula) fetchReservas();
   }, [userData]);
@@ -30,7 +42,7 @@ const MyReservations = ({ userData }) => {
           <div className="res-user-card">
             <img src={userData?.photo} alt={userData?.name} />
             <h3>{userData?.name}</h3>
-            <span className={`role-badge ${userData?.isAdmin ? 'role-admin' : 'role-user'}`}>{userData?.isAdmin ? 'Administrador' : 'Usuario'}</span>
+            <span className={`role-badge ${userData?.isAdmin ? 'role-admin' : 'role-user'}`}>{userData?.isAdmin ? 'Admin' : 'User'}</span>
           </div>
           <div className="location-card">
             <h3 className="location-header"><MapPin color="var(--primary)" size={20} /> Ubicación</h3>
@@ -54,8 +66,19 @@ const MyReservations = ({ userData }) => {
                <thead><tr><th>ID</th><th>Fecha</th><th>Escritorio</th><th>Horario</th><th>Estado</th><th>Motivo</th><th>Acciones</th></tr></thead>
                <tbody>
                  {reservas.map((reserva) => {
-                   const stateStr = (reserva.estado || '').toLowerCase();
-                   const isOwner = reserva.documento === userData?.cedula;
+                   const attr = reserva.attributes;
+                   
+                   // Extracción segura de relaciones (puestos y horarios)
+                   const escritorio = attr.working_puestos?.data?.[0]?.attributes?.nombre || 'Sin asignar';
+                   const turno = attr.working_horarios?.data?.[0]?.attributes?.nombre || 'Sin turno';
+                   
+                   // Manejo del estado: Como en la API es un booleano, lo traducimos a texto para mantener tus clases CSS
+                   let estadoTexto = attr.estado ? 'Confirmada' : 'Pendiente';
+                   if (attr.motivo_cancelacion) estadoTexto = 'Cancelada';
+                   
+                   const stateStr = estadoTexto.toLowerCase();
+                   const isOwner = attr.documento === userData?.cedula;
+                   
                    let sClass = '';
                    if(stateStr.includes('confirm')) sClass = 'confirmada';
                    else if(stateStr.includes('pend')) sClass = 'pendiente';
@@ -63,9 +86,12 @@ const MyReservations = ({ userData }) => {
 
                    return (
                      <tr key={reserva.id}>
-                       <td style={{fontWeight: 600}}>#{reserva.id}</td><td>{reserva.fecha}</td><td>Esc. {reserva.escritorio}</td><td>{reserva.turno}</td>
-                       <td><span className={`status-badge ${sClass}`}>{reserva.estado}</span></td>
-                       <td style={{color: 'var(--text-muted)'}}>{reserva.motivo || 'Ninguno'}</td>
+                       <td style={{fontWeight: 600}}>#{reserva.id}</td>
+                       <td>{attr.fecha_reserva}</td>
+                       <td style={{textTransform: 'capitalize'}}>{escritorio}</td>
+                       <td style={{textTransform: 'capitalize'}}>{turno}</td>
+                       <td><span className={`status-badge ${sClass}`}>{estadoTexto}</span></td>
+                       <td style={{color: 'var(--text-muted)'}}>{attr.motivo_cancelacion || 'Ninguno'}</td>
                        <td>
                          {stateStr.includes('pendiente') && isOwner && <button className="action-btn">Confirmar</button>}
                          {stateStr.includes('confirmada') && isOwner && <span style={{color:'var(--success)', display:'flex', alignItems:'center', gap:'0.25rem', fontSize:'0.85rem'}}><CheckCircle size={14}/> Lista</span>}

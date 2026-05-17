@@ -120,7 +120,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                 return (
                   <div key={id} className="sidebar-item" style={{opacity: !canSelect(id) ? 0.5 : 1}}>
                     <div className="sidebar-desk-info">
-                      <p className="title">Escritorio {id} {DESKS_MONITOR.includes(id) && <Monitor size={14} color="var(--primary)" />}</p>
+                      <p className="title">Escritorio {id} {DESKS_MONITOR.includes(id) && <Monitor size={18} color="var(--primary)" />}</p>
                       {dr.length > 0 && <div>
                         {dr.map((r, i) => {
                           const tName = horarios.find(h => h.id === getTurnoId(r))?.attributes?.nombre || 'Turno';
@@ -150,7 +150,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
 
             <div className="filters-bar">
               <div className="flex-center gap-2">
-                <Calendar color="var(--primary)" size={20} />
+                <Calendar color="var(--primary)" size={18} />
                 <select value={selectedDate} onChange={e => setSelectedDate(e.target.value)} className="date-picker" style={{padding: '0.5rem', border: '1px solid var(--border)', borderRadius: '4px'}}>
                   {availableDates.map(d => {
                     const dObj = new Date(d + 'T00:00:00');
@@ -170,13 +170,13 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                   <img src={chair3Img} alt="Ocupado" style={{ width: '20px', height: 'auto' }} /> Ocupado
                 </div>
                 <div className="flex-center gap-2" style={{marginLeft: '0.5rem'}}>
-                  <Monitor size={16}/> Con monitor
+                  <Monitor size={18}/> Con monitor
                 </div>
               </div>
             </div>
 
             <div className="map-container">
-              {loading && <div className="overlay-loader"><Loader2 className="spin" size={40} color="var(--primary)"/></div>}
+              {loading && <div className="overlay-loader"><Loader2 className="spin" size={18} color="var(--primary)"/></div>}
               <div className="table-graphic">
                 <img src={tableImg} alt="Mesa Principal" className="table-image" />
                 {desks.map((id, idx) => {
@@ -204,20 +204,20 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
       {bookingDesk && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3 style={{color: 'var(--primary)', display:'flex', alignItems:'center', gap:'0.5rem', margin:'0 0 1rem'}}><Calendar /> Confirmar Reserva</h3>
-            <p style={{marginBottom:'1rem'}}>Reservando <strong>Escritorio {bookingDesk}</strong> para el <strong>{selectedDate}</strong>.</p>
+            <h3 style={{color: 'var(--primary)', display:'flex', alignItems:'center', gap:'0.5rem', margin:'0 0 1rem'}}>Confirmar reserva</h3>
+            <p style={{marginBottom:'1rem'}}>Reservando <strong>Escritorio {bookingDesk}</strong> para el <strong>{selectedDate}</strong></p>
             <select value={selectedTurno} onChange={e => setSelectedTurno(e.target.value)} className="form-select">
               <option value="">Selecciona un turno...</option>
               {horarios.map(h => (
                 <option key={h.id} value={h.id} disabled={!isAvail(bookingDesk, h.id)}>
-                  {h.attributes?.nombre || h.nombre || h.id} ({h.attributes?.inicio || h.inicio} - {h.attributes?.fin || h.fin})
+                  {h.attributes?.inicio || h.inicio} - {h.attributes?.fin || h.fin}
                 </option>
               ))}
             </select>
             <div className="modal-actions">
               <Button variant="secondary" onClick={() => { setBookingDesk(null); setSelectedTurno(''); }}>Cancelar</Button>
               <Button onClick={handleBooking} disabled={!selectedTurno || loading}>
-                {loading ? <Loader2 className="spin" size={18} /> : 'Confirmar Reserva'}
+                {loading ? <Loader2 className="spin" size={18} /> : 'Confirmar reserva'}
               </Button>
             </div>
           </div>

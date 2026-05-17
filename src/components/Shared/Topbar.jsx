@@ -7,7 +7,7 @@ const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
     <div className="topbar-left">
       {showBack && (
         <button onClick={onBack} className="btn-icon-only">
-          <ChevronLeft size={24} />
+          <ChevronLeft size={18} />
         </button>
       )}
       
@@ -23,12 +23,12 @@ const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
     {userData && (
       <div className="topbar-right">
         <button onClick={() => onNavigate('myReservations')} className="nav-link" title="Mis reservas">
-          <Tickets size={20} /> 
+          <Tickets size={18} /> 
           <span className="nav-text">Mis reservas</span>
         </button>
         
         <button onClick={onLogout} className="btn-icon-only logout-btn" title="Cerrar sesión">
-          <LogOut size={20} />
+          <LogOut size={18} />
         </button>
       </div>
     )}

@@ -66,7 +66,7 @@ const Login = ({ onLoginSuccess }) => {
           <div className="form-group">
             <label htmlFor="cedula" className="form-label">Ingresa tu cédula para continuar</label>
             <div className="input-wrapper">
-              <IdCard className="input-icon" size={20} />
+              <IdCard className="input-icon" size={18} />
               <input
                 id="cedula" type="text" value={cedula} placeholder="No. de cédula" required
                 onChange={(e) => setCedula(e.target.value.replace(/\D/g, ''))}
@@ -76,7 +76,7 @@ const Login = ({ onLoginSuccess }) => {
           </div>
 
           <Button type="submit" className="btn-w-full" disabled={loading} style={{ padding: '0.8rem', fontSize: '1.1rem' }}>
-            {loading ? <Loader2 className="spin" size={24} /> : 'Ingresar'}
+            {loading ? <Loader2 className="spin" size={18} /> : 'Ingresar'}
           </Button>
         </form>
       </div>

@@ -64,7 +64,7 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
 
       {!checked ? (
         <div className="policy-box">
-          <div className="flex-center" style={{ padding: '2rem', gap: '1rem' }}><Loader2 className="spin" size={24} /><p>Verificando políticas...</p></div>
+          <div className="flex-center" style={{ padding: '2rem', gap: '1rem' }}><Loader2 className="spin" size={18} /><p>Verificando políticas...</p></div>
         </div>
       ) : !accepted ? (
         <div className="policy-box">
@@ -74,7 +74,7 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
             <ul className="policy-list">
               {policies.map(({ Icon, t, d, danger }, i) => (
                 <li key={i} className="policy-item">
-                  <div className={`policy-icon ${danger ? 'danger' : ''}`}><Icon size={20} /></div>
+                  <div className={`policy-icon ${danger ? 'danger' : ''}`}><Icon size={18} /></div>
                   <div className="policy-text-block"><strong>{t}</strong>{d}</div>
                 </li>
               ))}
