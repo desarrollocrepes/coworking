@@ -97,6 +97,37 @@
   margin: 0;
   font-size: 1.25rem;
 }
+
+/* --- CLASES NUEVAS PARA LOS FILTROS --- */
+.filters-bar-reservations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background: #f8fafc;
+}
+
+.filter-input, .filter-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  color: var(--text-main);
+}
+
+.filter-input {
+  flex: 1;
+  min-width: 250px;
+}
+
+.filter-input:focus, .filter-select:focus {
+  border-color: var(--primary);
+}
+/* -------------------------------------- */
+
 .table-wrapper {
   overflow-x: auto;
   position: relative;

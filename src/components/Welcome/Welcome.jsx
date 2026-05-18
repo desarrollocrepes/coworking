@@ -60,7 +60,11 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
         <div className="profile-section">
           <img src={userData.photo} alt={userData.name} className="profile-pic" />
           <div className="profile-details">
-            <h2>{getGreeting()}, {userData.name}!</h2>
+            <h2>
+              {getGreeting()},{' '}
+              <span className="name-mobile">{userData?.name?.split(' ')[0]}</span>
+              <span className="name-desktop">{userData.name}</span>!
+            </h2>
             <p className="role">{userData.cedula}</p>
           </div>
         </div>

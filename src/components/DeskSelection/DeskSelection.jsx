@@ -25,6 +25,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
   const [bookingDesk, setBookingDesk] = useState(null);
   const [selectedTurno, setSelectedTurno] = useState('');
   const [lastUserDesk, setLastUserDesk] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Nuevo estado para móviles
 
   const docId = userData?.cedula || userData?.documento;
   const isMorning = new Date().getHours() >= 0 && new Date().getHours() < 5;
@@ -111,10 +112,18 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
       <div className="container flex-1">
         <div className="desk-layout">
           
-          {/* SIDEBAR MOVIDO A LA IZQUIERDA */}
           <div className="desk-sidebar">
-            <div className="sidebar-header">Estado de escritorios</div>
-            <div className="sidebar-body">
+            <div 
+              className="sidebar-header"
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              style={{ cursor: 'pointer', justifyContent: 'space-between' }}
+            >
+              <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+                Estado de escritorios
+              </div>
+              <span className="toggle-icon-mobile">{isSidebarOpen ? '▲' : '▼'}</span>
+            </div>
+            <div className={`sidebar-body ${!isSidebarOpen ? 'hidden-mobile' : ''}`}>
               {desks.map(id => {
                 const dr = getDeskR(id);
                 return (
@@ -144,7 +153,6 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
             </div>
           </div>
 
-          {/* ÁREA PRINCIPAL MOVIDA A LA DERECHA */}
           <div className="desk-main-area">
             {errorMsg && <div className="alert alert-danger flex-between"><span>{errorMsg}</span><button onClick={() => setErrorMsg('')} style={{background:'none', border:'none', cursor:'pointer'}}><AlertTriangle size={18}/></button></div>}
 

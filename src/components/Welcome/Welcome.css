@@ -124,6 +124,10 @@
   justify-content: flex-end;
 }
 
+/* Modificaciones para el nombre en móviles */
+.name-mobile { display: inline; }
+.name-desktop { display: none; }
+
 @media (min-width: 640px) {
   .welcome-card {
     flex-direction: row;
@@ -133,4 +137,6 @@
   .time-widget {
     text-align: right;
   }
+  .name-mobile { display: none; }
+  .name-desktop { display: inline; }
 }

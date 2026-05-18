@@ -8,6 +8,11 @@ const MyReservations = ({ userData }) => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Estados para los filtros y búsqueda
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('todas');
+  const [filterOwnership, setFilterOwnership] = useState('todas');
+
   useEffect(() => {
     const fetchReservas = async () => {
       setLoading(true); 
@@ -33,6 +38,38 @@ const MyReservations = ({ userData }) => {
     if (userData?.cedula) fetchReservas();
   }, [userData]);
 
+  // Filtrado de la data
+  const filteredReservas = reservas.filter((reserva) => {
+    const attr = reserva.attributes;
+    
+    // Variables para la búsqueda global
+    const nombreColaborador = (attr.Nombre || attr.nombre || attr.documento || '').toLowerCase();
+    const idReserva = String(reserva.id);
+    const documento = String(attr.documento || '');
+
+    // 1. Filtro Búsqueda Global
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = !searchTerm || 
+                          idReserva.includes(searchLower) || 
+                          nombreColaborador.includes(searchLower) || 
+                          documento.includes(searchLower);
+
+    // 2. Filtro Estado
+    let estadoTexto = attr.estado ? 'confirmada' : 'pendiente';
+    if (attr.motivo_cancelacion) estadoTexto = 'cancelada';
+    const matchesStatus = filterStatus === 'todas' || estadoTexto === filterStatus;
+
+    // 3. Filtro Mis Reservas / Otras (Solo admin)
+    const isOwner = attr.documento === userData?.cedula;
+    let matchesOwnership = true;
+    if (userData?.isAdmin) {
+      if (filterOwnership === 'mis_reservas') matchesOwnership = isOwner;
+      if (filterOwnership === 'otras') matchesOwnership = !isOwner;
+    }
+
+    return matchesSearch && matchesStatus && matchesOwnership;
+  });
+
   return (
     <div className="container flex-1 py-8" style={{paddingTop: '2rem'}}>
       <div className="reservations-layout">
@@ -45,7 +82,6 @@ const MyReservations = ({ userData }) => {
             </span>
           </div>
           
-          {/* Ocultamos el cuadro de GPS si es Admin, ya que él entra a ver la gestión global */}
           {!userData?.isAdmin && (
             <div className="location-card">
               <h3 className="location-header"><MapPin color="var(--primary)" size={20} /> Ubicación</h3>
@@ -63,6 +99,31 @@ const MyReservations = ({ userData }) => {
            <div className="table-header">
               <h3>{userData?.isAdmin ? 'Gestión de reservas' : 'Detalles de reserva'}</h3>
            </div>
+
+           {/* --- NUEVA BARRA DE FILTROS --- */}
+           <div className="filters-bar-reservations">
+             <input 
+               type="text" 
+               placeholder="Buscar por ID, nombre o identificación..." 
+               value={searchTerm} 
+               onChange={(e) => setSearchTerm(e.target.value)} 
+               className="filter-input"
+             />
+             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="filter-select">
+               <option value="todas">Todos los estados</option>
+               <option value="confirmada">Confirmada</option>
+               <option value="pendiente">Pendiente</option>
+               <option value="cancelada">Cancelada</option>
+             </select>
+             {userData?.isAdmin && (
+               <select value={filterOwnership} onChange={(e) => setFilterOwnership(e.target.value)} className="filter-select">
+                 <option value="todas">Todas las reservas</option>
+                 <option value="mis_reservas">Mis reservas</option>
+                 <option value="otras">Otras reservas</option>
+               </select>
+             )}
+           </div>
+
            {errorMsg && <div className="alert alert-danger" style={{margin: '1rem', marginBottom: 0}}>{errorMsg}</div>}
            <div className="table-wrapper">
              {loading && <div className="overlay-loader"><Loader2 className="spin" size={32} color="var(--primary)" /></div>}
@@ -70,7 +131,6 @@ const MyReservations = ({ userData }) => {
                <thead>
                  <tr>
                    <th>ID</th>
-                   {/* Nueva columna visible solo para el Admin */}
                    {userData?.isAdmin && <th>Colaborador</th>}
                    <th>Fecha</th>
                    <th>Escritorio</th>
@@ -81,13 +141,17 @@ const MyReservations = ({ userData }) => {
                  </tr>
                </thead>
                <tbody>
-                 {reservas.map((reserva) => {
+                 {filteredReservas.map((reserva) => {
                    const attr = reserva.attributes;
                    
-                   const escritorio = attr.working_puestos?.data?.[0]?.attributes?.nombre || 'Sin asignar';
-                   const turno = attr.working_horarios?.data?.[0]?.attributes?.nombre || 'Sin turno';
+                   // --- CAMBIOS EN ESCRITORIO Y HORARIO ---
+                   const escritorioNombre = attr.working_puestos?.data?.[0]?.attributes?.nombre || '';
+                   const escritorio = escritorioNombre.replace(/\D/g, '') || '-'; // Extrae solo el número
+
+                   const horarioAttr = attr.working_horarios?.data?.[0]?.attributes;
+                   // Formatea para mostrar hora de inicio - fin
+                   const turno = horarioAttr ? `${horarioAttr.inicio?.slice(0,5) || ''} - ${horarioAttr.fin?.slice(0,5) || ''}` : 'Sin turno';
                    
-                   // Sacamos el nombre del colaborador (la API de Strapi usualmente lo guarda como Nombre o nombre)
                    const nombreColaborador = attr.Nombre || attr.nombre || attr.documento || 'Desconocido';
                    
                    let estadoTexto = attr.estado ? 'Confirmada' : 'Pendiente';
@@ -104,7 +168,6 @@ const MyReservations = ({ userData }) => {
                    return (
                      <tr key={reserva.id}>
                        <td style={{fontWeight: 600}}>#{reserva.id}</td>
-                       {/* Mostrar el colaborador solo si es Admin */}
                        {userData?.isAdmin && <td style={{textTransform: 'capitalize', fontSize: '0.85rem', fontWeight: 500}}>{nombreColaborador.toLowerCase()}</td>}
                        <td>{attr.fecha_reserva}</td>
                        <td style={{textTransform: 'capitalize'}}>{escritorio}</td>
@@ -119,7 +182,7 @@ const MyReservations = ({ userData }) => {
                      </tr>
                    );
                  })}
-                 {!loading && reservas.length === 0 && <tr><td colSpan={userData?.isAdmin ? "8" : "7"} style={{textAlign: 'center', padding: '3rem'}}>No hay reservas.</td></tr>}
+                 {!loading && filteredReservas.length === 0 && <tr><td colSpan={userData?.isAdmin ? "8" : "7"} style={{textAlign: 'center', padding: '3rem'}}>No hay reservas.</td></tr>}
                </tbody>
              </table>
            </div>

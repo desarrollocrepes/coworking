@@ -17,7 +17,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  height: max-content;
+  height: fit-content; /* Cambiado para que se ajuste en móviles */
 }
 
 .filters-bar {
@@ -84,7 +84,6 @@
   margin: 4rem 0;
 }
 
-/*CLDE 2 LINES*/
 .table-image {
   width: 80%;
   height: auto;
@@ -161,16 +160,22 @@
   font-size: 0.95rem;
 }
 
+/* Nuevas clases para comportamiento en móviles del sidebar */
+.hidden-mobile { display: none !important; }
+.toggle-icon-mobile { display: block; font-size: 0.8rem; }
+
 @media (min-width: 1024px) {
   .desk-layout {
     flex-direction: row;
   }
   .desk-sidebar {
     width: 320px;
-    height: 80vh;
+    height: 80vh; /* Retorna a 80vh en escritorio */
   }
   .sidebar-body {
     max-height: none;
     flex: 1;
   }
+  .hidden-mobile { display: flex !important; } /* Siempre visible en escritorio */
+  .toggle-icon-mobile { display: none; }
 }
