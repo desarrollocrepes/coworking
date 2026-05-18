@@ -45,6 +45,7 @@ export default function CoworkingApp() {
       {currentView !== 'login' && (
         <Topbar
           showBack={currentView === 'rooms' || currentView === 'deskSelection' || currentView === 'myReservations'}
+          showProfileInfo={currentView !== 'welcome'}
           onBack={() => {
             if(currentView === 'myReservations' || currentView === 'rooms') setCurrentView('welcome');
             if(currentView === 'deskSelection') setCurrentView('rooms');

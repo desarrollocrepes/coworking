@@ -2,7 +2,8 @@ import React from 'react';
 import { ChevronLeft, LogOut, Tickets, Shield } from 'lucide-react';
 import './Topbar.css';
 
-const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
+// 1. Recibe showProfileInfo en lugar de showPhoto
+const Topbar = ({ showBack, showProfileInfo, onBack, userData, onNavigate, onLogout }) => (
   <header className="topbar">
     <div className="topbar-left">
       {showBack && (
@@ -11,14 +12,16 @@ const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
         </button>
       )}
       
-      <div className="user-profile">
-        <img src={userData.photo} alt="Perfil" className="user-avatar" />
-        <div className="user-info-text">
-          <p>{userData.name.split(' ')[0]}</p>
-          <span>{userData.cedula}
-          </span>
+      {/* 2. Envuelve TODO el contenedor del perfil con la condición */}
+      {showProfileInfo && (
+        <div className="user-profile">
+          <img src={userData.photo} alt="Perfil" className="user-avatar" />
+          <div className="user-info-text">
+            <p>{userData.name.split(' ')[0]}</p>
+            <span>{userData.cedula}</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
 
     {userData && (
@@ -28,7 +31,6 @@ const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
           className="nav-link" 
           title={userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
         >
-          <Tickets size={18} /> 
           <span className="nav-text">
             {userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
           </span>
