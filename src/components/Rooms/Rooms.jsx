@@ -40,7 +40,6 @@ export default function Rooms({ onSelectRoom }) {
                 <p><Armchair size={18} color="var(--primary)" /> <strong>{s.capacidad || 0} puestos</strong></p>
                 <p><Monitor size={18} color="var(--primary)" /> <span>{s.monitores || 0} con monitor</span></p>
               </div>
-              <div className="room-action-icon"><ChevronRight size={18} /></div>
             </div>
           </div>
         ))}
