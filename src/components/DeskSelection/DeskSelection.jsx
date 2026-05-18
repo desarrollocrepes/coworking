@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Monitor, Clock, AlertTriangle, Loader2 } from 'lucide-react';
+import { Calendar, Monitor, Clock, AlertTriangle, Loader2, SquareArrowDown, SquareArrowLeft, SquareArrowUp, ArrowDown, ArrowUp } from 'lucide-react';
 import Button from '../Shared/Button';
 import tableImg from '../../assets/tables/table.png';
 import chair1Img from '../../assets/chairs/chair1.png';
@@ -121,7 +121,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
               <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
                 Estado de escritorios
               </div>
-              <span className="toggle-icon-mobile">{isSidebarOpen ? '▲' : '▼'}</span>
+              <span className="toggle-icon-mobile">{isSidebarOpen ? <ArrowUp size={18}/> : <ArrowDown size={18}/>}</span>
             </div>
             <div className={`sidebar-body ${!isSidebarOpen ? 'hidden-mobile' : ''}`}>
               {desks.map(id => {
