@@ -23,12 +23,12 @@ const Topbar = ({ showBack, onBack, userData, onNavigate, onLogout }) => (
 
     {userData && (
       <div className="topbar-right">
-        {/* El texto cambia dinámicamente dependiendo si es admin o no */}
         <button 
           onClick={() => onNavigate('myReservations')} 
           className="nav-link" 
           title={userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
         >
+          <Tickets size={18} /> 
           <span className="nav-text">
             {userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
           </span>

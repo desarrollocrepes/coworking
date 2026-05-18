@@ -1,6 +1,6 @@
 .topbar {
   background-color: white;
-  border-bottom: 1px solid #e5e7eb; /* o var(--border-color) */
+  border-bottom: 1px solid #e5e7eb;
   padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
