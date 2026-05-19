@@ -95,9 +95,9 @@ const MyReservations = ({ userData }) => {
         setIsWithinRange(false);
         setLocationStatus('error');
         if (error.code === error.PERMISSION_DENIED) {
-          setLocationMsg('Permiso de ubicación denegado.');
+          setLocationMsg('Permiso de ubicación denegado');
         } else {
-          setLocationMsg('No se pudo obtener la ubicación.');
+          setLocationMsg('No se pudo obtener la ubicación');
         }
       },
       { enableHighAccuracy: true }
@@ -200,7 +200,6 @@ const MyReservations = ({ userData }) => {
             
             {/* 6. Card de Ubicación Dinámica */}
             <div className="location-card">
-              <h3 className="location-header">Validación de Perímetro</h3>
               <div className="location-status">
                 {locationStatus === 'allowed' ? (
                   <MapPin color="var(--success, #22c55e)" size={28} style={{margin: '0 auto'}} />
@@ -210,7 +209,7 @@ const MyReservations = ({ userData }) => {
                   <MapPinOff color="var(--danger, #ef4444)" size={28} style={{margin: '0 auto'}} />
                 )}
                 <p style={{ fontWeight: '600', marginTop: '0.5rem' }}>
-                  {locationStatus === 'allowed' ? 'En el perímetro' : locationStatus === 'pending' ? 'Verificando...' : 'Acceso Restringido'}
+                  {locationStatus === 'allowed' ? 'En el perímetro' : locationStatus === 'pending' ? 'Verificando...' : 'Acceso restringido'}
                 </p>
                 <span style={{ fontSize: '0.85rem', display: 'block', marginTop: '0.25rem' }}>{locationMsg}</span>
               </div>

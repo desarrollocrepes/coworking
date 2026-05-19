@@ -22,10 +22,6 @@ export default function Rooms({ onSelectRoom }) {
 
   return (
     <div className="container flex-1">
-      <div className="page-header">
-        <div><h2>Elige tu sala</h2><p>Selecciona la sala para continuar con tu reserva.</p></div>
-        {loading && <Loader2 className="spin text-primary" size={18} color="var(--primary)" />}
-      </div>
       {err && <div className="alert alert-danger">{err}</div>}
       <div className="rooms-grid">
         {salas.map((s) => (

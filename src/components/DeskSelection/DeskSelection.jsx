@@ -147,7 +147,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                           );
                         })}
                       </div>}
-                      {!canSelect(id) && <p style={{fontSize: '0.75rem', color: 'var(--warning)'}}>Debes seleccionar otro escritorio</p>}
+                      {!canSelect(id) && <p style={{fontSize: '0.75rem', color: 'red'}}>Debes seleccionar otro escritorio</p>}
                     </div>
                   </div>
                 );

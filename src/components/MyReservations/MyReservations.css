@@ -48,13 +48,7 @@
   padding: 1.5rem;
   border: 1px solid var(--border-color);
 }
-.location-header {
-  margin: 0 0 1rem 0;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+
 .location-status {
   background: var(--danger-light);
   padding: 1rem;
