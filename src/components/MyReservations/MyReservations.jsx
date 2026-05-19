@@ -84,7 +84,7 @@ const MyReservations = ({ userData }) => {
           
           {!userData?.isAdmin && (
             <div className="location-card">
-              <h3 className="location-header"><MapPin color="var(--primary)" size={20} /> Ubicación</h3>
+              <h3 className="location-header">Ubicación</h3>
               <div className="location-status">
                 <MapPinOff color="var(--danger)" size={28} style={{margin: '0 auto'}} />
                 <p>Permiso denegado</p>

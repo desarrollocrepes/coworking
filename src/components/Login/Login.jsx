@@ -54,17 +54,11 @@ const Login = ({ onLoginSuccess }) => {
     <div className="login-wrapper">
       <div className="login-card">
         <div className="login-header">
-          <Briefcase size={48} style={{ margin: '0 auto', opacity: 0.9 }} />
+          <Briefcase size={48} />
           <h2>¡Bienvenido a nuestro espacio de Co-Working!</h2>
         </div>
 
         <form onSubmit={handleLogin} className="login-body">
-          {errorMsg && (
-            <div className="alert alert-danger">
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
           <div className="form-group">
             <label htmlFor="cedula" className="form-label">Ingresa tu cédula para continuar</label>
             <div className="input-wrapper">
@@ -76,7 +70,11 @@ const Login = ({ onLoginSuccess }) => {
               />
             </div>
           </div>
-
+          {errorMsg && (
+            <div className="alert alert-danger">
+              <span>{errorMsg}</span>
+            </div>
+          )}
           <Button type="submit" className="btn-w-full" disabled={loading} style={{ padding: '0.8rem', fontSize: '1.1rem' }}>
             {loading ? <Loader2 className="spin" size={18} /> : 'Ingresar'}
           </Button>

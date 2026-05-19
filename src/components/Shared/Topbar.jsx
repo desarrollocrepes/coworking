@@ -32,7 +32,7 @@ const Topbar = ({ showBack, showProfileInfo, onBack, userData, onNavigate, onLog
           title={userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
         >
           <span className="nav-text">
-            {userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
+            <Tickets size={18} /> {userData.isAdmin ? "Gestión reservas" : "Mis reservas"}
           </span>
         </button>
         

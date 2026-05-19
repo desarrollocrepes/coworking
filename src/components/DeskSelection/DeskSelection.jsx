@@ -169,13 +169,13 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
               </div>
               <div className="legend-items">
                 <div className="flex-center gap-2">
-                  <img src={chair1Img} alt="Disponible" style={{ width: '20px', height: 'auto' }} /> Disponible
+                  <img src={chair1Img} alt="Disponible" style={{ width: '15px', height: 'auto' }} /> Disponible
                 </div>
                 <div className="flex-center gap-2">
-                  <img src={chair2Img} alt="Limitado" style={{ width: '20px', height: 'auto' }} /> Limitado
+                  <img src={chair2Img} alt="Limitado" style={{ width: '15px', height: 'auto' }} /> Limitado
                 </div>
                 <div className="flex-center gap-2">
-                  <img src={chair3Img} alt="Ocupado" style={{ width: '20px', height: 'auto' }} /> Ocupado
+                  <img src={chair3Img} alt="Ocupado" style={{ width: '15px', height: 'auto' }} /> Ocupado
                 </div>
                 <div className="flex-center gap-2" style={{marginLeft: '0.5rem'}}>
                   <Monitor size={18}/> Con monitor
@@ -194,7 +194,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                   return (
                     <div 
                       key={id} className={`desk-node ${isTop ? 'top' : 'bottom'} ${status}`} 
-                      style={{ left: `${isTop ? 10+(idx*30) : 20+((idx-3)*30)}%`, opacity: isRotDisabled ? 0.5 : 1 }}
+                      style={{ left: `${isTop ? 20+(idx*30) : 20+((idx-3)*30)}%`, opacity: isRotDisabled ? 0.5 : 1 }}
                       title={isRotDisabled ? 'Rotación: usado recientemente' : isOcc ? `Ocupado por: ${names}` : 'Disponible'}
                       onClick={() => !isOcc && canSelect(id) && setBookingDesk(id)}
                     >
@@ -205,7 +205,6 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
