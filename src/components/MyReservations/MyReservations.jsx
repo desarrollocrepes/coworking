@@ -32,12 +32,15 @@ const MyReservations = ({ userData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // 2. Nuevos estados para geolocalización
+  // Estados para geolocalización
   const [isWithinRange, setIsWithinRange] = useState(false);
-  const [locationStatus, setLocationStatus] = useState('pending'); // 'pending', 'allowed', 'denied', 'error'
+  const [locationStatus, setLocationStatus] = useState('pending');
   const [locationMsg, setLocationMsg] = useState('Haz clic en actualizar para verificar.');
 
-  // 3. Función para traer las reservas extraída para poder reutilizarla
+  // Estados para Modal de Cancelación
+  const [cancelModal, setCancelModal] = useState({ isOpen: false, reservaId: null });
+  const [cancelReason, setCancelReason] = useState('');
+
   const fetchReservas = useCallback(async () => {
     setLoading(true); 
     setErrorMsg('');
@@ -64,7 +67,6 @@ const MyReservations = ({ userData }) => {
     if (userData?.cedula) fetchReservas();
   }, [fetchReservas, userData]);
 
-  // 4. Función de verificación de coordenadas
   const verificarUbicacion = useCallback(() => {
     setLocationStatus('pending');
     setLocationMsg('Obteniendo coordenadas...');
@@ -104,16 +106,15 @@ const MyReservations = ({ userData }) => {
     );
   }, []);
 
-  // Verificar ubicación al cargar (solo si no es admin)
   useEffect(() => {
     if (userData && !userData.isAdmin) {
       verificarUbicacion();
     }
   }, [userData, verificarUbicacion]);
 
-  // 5. Manejador para confirmar reserva a la API
+  // Manejador para Confirmar
   const handleConfirmarReserva = async (reservaId) => {
-    if (!isWithinRange) {
+    if (!userData?.isAdmin && !isWithinRange) {
       setErrorMsg('No puedes confirmar la reserva si estás fuera del perímetro permitido.');
       return;
     }
@@ -124,14 +125,13 @@ const MyReservations = ({ userData }) => {
       const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        // En tu lógica, "attr.estado ? 'confirmada'" indica que "estado" se maneja como un booleano (true/false)
         body: JSON.stringify({ data: { estado: true } }) 
       });
 
       if (!res.ok) throw new Error('No se pudo confirmar la reserva en la API.');
       
       setErrorMsg('');
-      await fetchReservas(); // Refrescar los datos de la tabla
+      await fetchReservas();
     } catch (err) {
       setErrorMsg(err.message);
     } finally {
@@ -139,29 +139,102 @@ const MyReservations = ({ userData }) => {
     }
   };
 
+  // Manejador para Cancelar
+  const handleCancelSubmit = async () => {
+    if (!cancelModal.reservaId) return;
+    setLoading(true);
+    
+    let finalReason = cancelReason;
+    if (userData?.isAdmin) {
+      const date = new Date();
+      const dateStr = date.toLocaleDateString('es-ES');
+      const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      finalReason = `${userData.name} eliminó este registro el ${dateStr} a las ${timeStr}. Motivo: ${cancelReason}`;
+    }
+
+    try {
+      const url = `https://macfer.crepesywaffles.com/api/working-reservas/${cancelModal.reservaId}`;
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: { estado: false, motivo_cancelacion: finalReason } }) 
+      });
+
+      if (!res.ok) throw new Error('No se pudo cancelar la reserva.');
+      
+      setCancelModal({ isOpen: false, reservaId: null });
+      setCancelReason('');
+      setErrorMsg('');
+      await fetchReservas();
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Manejador para Reactivar
+  const handleReactivarReserva = async (reserva) => {
+    const attr = reserva.attributes;
+    const deskId = attr.working_puestos?.data?.[0]?.id;
+    const date = attr.fecha_reserva;
+    const horarioId = attr.working_horarios?.data?.[0]?.id;
+
+    // Validación: verificar si el puesto ya fue tomado (estado null o true) en la misma fecha y hora
+    const isOccupied = reservas.some(r => 
+        r.id !== reserva.id &&
+        r.attributes.fecha_reserva === date &&
+        r.attributes.working_puestos?.data?.[0]?.id === deskId &&
+        r.attributes.working_horarios?.data?.[0]?.id === horarioId &&
+        r.attributes.estado !== false 
+    );
+
+    if (isOccupied) {
+        setErrorMsg("No se puede reactivar. El escritorio ya fue reservado por otra persona en esa fecha y horario.");
+        return;
+    }
+
+    setLoading(true);
+    try {
+      const url = `https://macfer.crepesywaffles.com/api/working-reservas/${reserva.id}`;
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: { estado: null, motivo_cancelacion: null } }) 
+      });
+
+      if (!res.ok) throw new Error('No se pudo reactivar la reserva.');
+      
+      setErrorMsg('');
+      await fetchReservas();
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filtrado de la data
   const filteredReservas = reservas.filter((reserva) => {
     const attr = reserva.attributes;
     
-    // Variables para la búsqueda global
     const nombreColaborador = (attr.Nombre || attr.nombre || attr.documento || '').toLowerCase();
     const idReserva = String(reserva.id);
     const documento = String(attr.documento || '');
 
-    // 1. Filtro Búsqueda Global
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = !searchTerm || 
                           idReserva.includes(searchLower) || 
                           nombreColaborador.includes(searchLower) || 
                           documento.includes(searchLower);
 
-    // 2. Filtro Estado
-    let estadoTexto = attr.estado ? 'confirmada' : 'pendiente';
-    if (attr.motivo_cancelacion) estadoTexto = 'cancelada';
+    // Lógica nueva de estado (null, true, false)
+    let estadoTexto = 'pendiente';
+    if (attr.estado === true) estadoTexto = 'confirmada';
+    if (attr.estado === false) estadoTexto = 'cancelada';
+    
     const matchesStatus = filterStatus === 'todas' || estadoTexto === filterStatus;
 
-    // 3. Filtro Mis Reservas / Otras (Solo admin)
     const isOwner = attr.documento === userData?.cedula;
     let matchesOwnership = true;
     if (userData?.isAdmin) {
@@ -172,12 +245,10 @@ const MyReservations = ({ userData }) => {
     return matchesSearch && matchesStatus && matchesOwnership;
   });
 
-  // Resetear página a 1 si se cambian los filtros
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterStatus, filterOwnership]);
 
-  // Lógica de paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentReservas = filteredReservas.slice(indexOfFirstItem, indexOfLastItem);
@@ -185,9 +256,33 @@ const MyReservations = ({ userData }) => {
 
   return (
     <div className="container flex-1 py-8" style={{paddingTop: '2rem'}}>
+      {/* Modal de Cancelación */}
+      {cancelModal.isOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Cancelar Reserva</h3>
+            <p>Por favor, indica el motivo de la cancelación:</p>
+            <textarea 
+              value={cancelReason} 
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Escribe el motivo aquí..."
+            />
+            <div className="modal-actions">
+              <Button variant="secondary" onClick={() => {
+                setCancelModal({ isOpen: false, reservaId: null });
+                setCancelReason('');
+              }}>
+                Cerrar
+              </Button>
+              <Button onClick={handleCancelSubmit} disabled={!cancelReason.trim() || loading}>
+                {loading ? <Loader2 className="spin" size={16} /> : 'Confirmar'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="reservations-layout">
-        
-        {/* Sidebar oculto completamente si es Admin */}
         {!userData?.isAdmin && (
           <div className="res-sidebar">
             <div className="res-user-card">
@@ -198,7 +293,6 @@ const MyReservations = ({ userData }) => {
               </span>
             </div>
             
-            {/* 6. Card de Ubicación Dinámica */}
             <div className="location-card">
               <div className="location-status">
                 {locationStatus === 'allowed' ? (
@@ -282,16 +376,14 @@ const MyReservations = ({ userData }) => {
                    
                    const nombreColaborador = attr.Nombre || attr.nombre || attr.documento || 'Desconocido';
                    
-                   let estadoTexto = attr.estado ? 'Confirmada' : 'Pendiente';
-                   if (attr.motivo_cancelacion) estadoTexto = 'Cancelada';
+                   // Estados precisos basados en null/true/false
+                   let estadoTexto = 'Pendiente';
+                   if (attr.estado === true) estadoTexto = 'Confirmada';
+                   if (attr.estado === false) estadoTexto = 'Cancelada';
                    
-                   const stateStr = estadoTexto.toLowerCase();
                    const isOwner = attr.documento === userData?.cedula;
                    
-                   let sClass = '';
-                   if(stateStr.includes('confirm')) sClass = 'confirmada';
-                   else if(stateStr.includes('pend')) sClass = 'pendiente';
-                   else if(stateStr.includes('cancel')) sClass = 'cancelada';
+                   let sClass = estadoTexto.toLowerCase();
 
                    return (
                      <tr key={reserva.id}>
@@ -303,28 +395,47 @@ const MyReservations = ({ userData }) => {
                        <td><span className={`status-badge ${sClass}`}>{estadoTexto}</span></td>
                        <td style={{color: 'var(--text-muted)', fontSize: '0.85rem'}}>{attr.motivo_cancelacion || 'Ninguno'}</td>
                        <td>
-                         {/* 7. Actualización del botón Confirmar */}
-                         {isOwner && !stateStr.includes('cancelada') && (
-                           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                             {stateStr.includes('pendiente') && (
-                               <button 
-                                 className="action-btn confirm-btn"
-                                 disabled={!isWithinRange || loading}
-                                 onClick={() => handleConfirmarReserva(reserva.id)}
-                                 title={!isWithinRange ? "Debes estar a menos de 1000m de la oficina" : ""}
-                                 style={{ 
-                                   opacity: !isWithinRange ? 0.5 : 1, 
-                                   cursor: !isWithinRange ? 'not-allowed' : 'pointer' 
-                                 }}
-                               >
-                                 Confirmar
-                               </button>
-                             )}
-                             <button className="action-btn cancel-btn">Cancelar</button>
-                           </div>
-                         )}
-                         {userData?.isAdmin && !isOwner && <span style={{fontSize: '0.8rem', color: '#999'}}>-</span>}
-                         {isOwner && stateStr.includes('cancelada') && <span style={{fontSize: '0.8rem', color: '#999'}}>-</span>}
+                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                           {/* Confirmar: Si es nula (Pendiente). Administradores siempre, Usuarios dentro de rango */}
+                           {attr.estado === null && (
+                             <button 
+                               className="action-btn confirm-btn"
+                               disabled={!userData?.isAdmin && (!isWithinRange || loading)}
+                               onClick={() => handleConfirmarReserva(reserva.id)}
+                               title={!userData?.isAdmin && !isWithinRange ? "Debes estar a menos de 1000m de la oficina" : ""}
+                               style={{ 
+                                 opacity: (!userData?.isAdmin && !isWithinRange) ? 0.5 : 1, 
+                                 cursor: (!userData?.isAdmin && !isWithinRange) ? 'not-allowed' : 'pointer' 
+                               }}
+                             >
+                               Confirmar
+                             </button>
+                           )}
+
+                           {/* Cancelar: Si no está cancelada, en cualquier momento */}
+                           {attr.estado !== false && (
+                             <button 
+                               className="action-btn cancel-btn"
+                               onClick={() => {
+                                 setCancelReason('');
+                                 setCancelModal({ isOpen: true, reservaId: reserva.id });
+                               }}
+                             >
+                               Cancelar
+                             </button>
+                           )}
+
+                           {/* Reactivar: Solo Admins si el estado es cancelado (false) */}
+                           {attr.estado === false && userData?.isAdmin && (
+                             <button 
+                               className="action-btn"
+                               style={{ borderColor: 'var(--success, #22c55e)', color: 'var(--success, #22c55e)' }}
+                               onClick={() => handleReactivarReserva(reserva)}
+                             >
+                               Reactivar
+                             </button>
+                           )}
+                         </div>
                        </td>
                      </tr>
                    );
@@ -334,7 +445,6 @@ const MyReservations = ({ userData }) => {
              </table>
            </div>
 
-           {/* Controles de Paginación */}
            {totalPages > 1 && (
              <div className="pagination-controls">
                <button 
