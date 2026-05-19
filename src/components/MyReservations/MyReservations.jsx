@@ -13,6 +13,10 @@ const MyReservations = ({ userData }) => {
   const [filterStatus, setFilterStatus] = useState('todas');
   const [filterOwnership, setFilterOwnership] = useState('todas');
 
+  // Estado para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   useEffect(() => {
     const fetchReservas = async () => {
       setLoading(true); 
@@ -70,19 +74,32 @@ const MyReservations = ({ userData }) => {
     return matchesSearch && matchesStatus && matchesOwnership;
   });
 
+  // Resetear página a 1 si se cambian los filtros
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, filterOwnership]);
+
+  // Lógica de paginación
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentReservas = filteredReservas.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredReservas.length / itemsPerPage);
+
   return (
     <div className="container flex-1 py-8" style={{paddingTop: '2rem'}}>
       <div className="reservations-layout">
-        <div className="res-sidebar">
-          <div className="res-user-card">
-            <img src={userData?.photo} alt={userData?.name} />
-            <h3>{userData?.name}</h3>
-            <span className={`role-badge ${userData?.isAdmin ? 'role-admin' : 'role-user'}`}>
-              {userData?.isAdmin ? 'Admin' : 'User'}
-            </span>
-          </div>
-          
-          {!userData?.isAdmin && (
+        
+        {/* Sidebar oculto completamente si es Admin */}
+        {!userData?.isAdmin && (
+          <div className="res-sidebar">
+            <div className="res-user-card">
+              <img src={userData?.photo} alt={userData?.name} />
+              <h3>{userData?.name}</h3>
+              <span className={`role-badge role-user`}>
+                User
+              </span>
+            </div>
+            
             <div className="location-card">
               <h3 className="location-header">Ubicación</h3>
               <div className="location-status">
@@ -92,15 +109,14 @@ const MyReservations = ({ userData }) => {
               </div>
               <Button className="btn-w-full" variant="secondary"><RefreshCw size={16} /> Actualizar</Button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
         
-        <div className="table-container">
+        <div className="table-container" style={{ flex: 1 }}>
            <div className="table-header">
               <h3>{userData?.isAdmin ? 'Gestión de reservas' : 'Detalles de reserva'}</h3>
            </div>
 
-           {/* --- NUEVA BARRA DE FILTROS --- */}
            <div className="filters-bar-reservations">
              <input 
                type="text" 
@@ -141,15 +157,13 @@ const MyReservations = ({ userData }) => {
                  </tr>
                </thead>
                <tbody>
-                 {filteredReservas.map((reserva) => {
+                 {currentReservas.map((reserva) => {
                    const attr = reserva.attributes;
                    
-                   // --- CAMBIOS EN ESCRITORIO Y HORARIO ---
                    const escritorioNombre = attr.working_puestos?.data?.[0]?.attributes?.nombre || '';
-                   const escritorio = escritorioNombre.replace(/\D/g, '') || '-'; // Extrae solo el número
+                   const escritorio = escritorioNombre.replace(/\D/g, '') || '-';
 
                    const horarioAttr = attr.working_horarios?.data?.[0]?.attributes;
-                   // Formatea para mostrar hora de inicio - fin
                    const turno = horarioAttr ? `${horarioAttr.inicio?.slice(0,5) || ''} - ${horarioAttr.fin?.slice(0,5) || ''}` : 'Sin turno';
                    
                    const nombreColaborador = attr.Nombre || attr.nombre || attr.documento || 'Desconocido';
@@ -175,9 +189,14 @@ const MyReservations = ({ userData }) => {
                        <td><span className={`status-badge ${sClass}`}>{estadoTexto}</span></td>
                        <td style={{color: 'var(--text-muted)', fontSize: '0.85rem'}}>{attr.motivo_cancelacion || 'Ninguno'}</td>
                        <td>
-                         {stateStr.includes('pendiente') && isOwner && <button className="action-btn">Confirmar</button>}
-                         {stateStr.includes('confirmada') && isOwner && <span style={{color:'var(--success)', display:'flex', alignItems:'center', gap:'0.25rem', fontSize:'0.85rem'}}><CheckCircle size={14}/> Lista</span>}
+                         {isOwner && !stateStr.includes('cancelada') && (
+                           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                             {stateStr.includes('pendiente') && <button className="action-btn">Confirmar</button>}
+                             <button className="action-btn cancel-btn">Cancelar</button>
+                           </div>
+                         )}
                          {userData?.isAdmin && !isOwner && <span style={{fontSize: '0.8rem', color: '#999'}}>-</span>}
+                         {isOwner && stateStr.includes('cancelada') && <span style={{fontSize: '0.8rem', color: '#999'}}>-</span>}
                        </td>
                      </tr>
                    );
@@ -186,6 +205,30 @@ const MyReservations = ({ userData }) => {
                </tbody>
              </table>
            </div>
+
+           {/* Controles de Paginación */}
+           {totalPages > 1 && (
+             <div className="pagination-controls">
+               <button 
+                 disabled={currentPage === 1} 
+                 onClick={() => setCurrentPage(p => p - 1)}
+                 className="action-btn"
+               >
+                 Anterior
+               </button>
+               <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                 Página {currentPage} de {totalPages}
+               </span>
+               <button 
+                 disabled={currentPage === totalPages} 
+                 onClick={() => setCurrentPage(p => p + 1)}
+                 className="action-btn"
+               >
+                 Siguiente
+               </button>
+             </div>
+           )}
+
         </div>
       </div>
     </div>

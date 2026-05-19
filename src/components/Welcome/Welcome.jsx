@@ -106,7 +106,7 @@ const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) =
               <h3 style={{ margin: '0 0 0.25rem' }}>Ya has confirmado las Políticas de Reserva del Co-Working</h3>
             </div>
           </div>
-          <Button onClick={onContinue}>Continuar<ChevronLeft style={{ transform: 'rotate(180deg)' }} size={18} /></Button>
+          <Button onClick={onContinue}>Continuar a Salas<ChevronLeft style={{ transform: 'rotate(180deg)' }} size={18} /></Button>
         </div>
       )}
     </div>

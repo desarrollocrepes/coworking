@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Monitor, Clock, AlertTriangle, Loader2, SquareArrowDown, SquareArrowLeft, SquareArrowUp, ArrowDown, ArrowUp } from 'lucide-react';
+import { Calendar, Monitor, Clock, AlertTriangle, Loader2, SquareArrowDown, SquareArrowLeft, SquareArrowUp, ArrowDown, ArrowUp, Ticket } from 'lucide-react';
 import Button from '../Shared/Button';
 import tableImg from '../../assets/tables/table.png';
 import chair1Img from '../../assets/chairs/chair1.png';
@@ -132,8 +132,10 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                       <p className="title">Escritorio {id} {DESKS_MONITOR.includes(id) && <Monitor size={18} color="var(--primary)" />}</p>
                       {dr.length > 0 && <div>
                         {dr.map((r, i) => {
-                          const tName = horarios.find(h => h.id === getTurnoId(r))?.attributes?.nombre || 'Turno';
-                          const lbl = tName === 'Entrada' ? '🌅 AM' : tName === 'Salida' ? '🌆 PM' : tName === 'Completo' ? '☀️ Todo el día' : tName;
+                          const t = horarios.find(h => h.id === getTurnoId(r));
+                          const inicio = t?.attributes?.inicio?.slice(0, 5) || t?.inicio?.slice(0,5) || '--:--';
+                          const fin = t?.attributes?.fin?.slice(0, 5) || t?.fin?.slice(0,5) || '--:--';
+                          const lbl = `${inicio} - ${fin}`;
                           return (
                             <div key={i} style={{marginBottom:'0.5rem', padding:'0.5rem', background:'transparent', borderRadius:'4px', display:'flex', gap:'0.5rem'}}>
                               {r.attributes?.foto && <img src={r.attributes.foto} alt="foto" style={{width:32, height:32, borderRadius:'50%', objectFit:'cover'}} />}
@@ -210,22 +212,70 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
 
       {bookingDesk && (
         <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 style={{color: 'var(--primary)', display:'flex', alignItems:'center', gap:'0.5rem', margin:'0 0 1rem'}}>Confirmar reserva</h3>
-            <p style={{marginBottom:'1rem'}}>Reservando <strong>Escritorio {bookingDesk}</strong> para el <strong>{selectedDate}</strong></p>
-            <select value={selectedTurno} onChange={e => setSelectedTurno(e.target.value)} className="form-select">
-              <option value="">Selecciona un turno...</option>
-              {horarios.map(h => (
-                <option key={h.id} value={h.id} disabled={!isAvail(bookingDesk, h.id)}>
-                  {h.attributes?.inicio || h.inicio} - {h.attributes?.fin || h.fin}
-                </option>
-              ))}
-            </select>
-            <div className="modal-actions">
-              <Button variant="secondary" onClick={() => { setBookingDesk(null); setSelectedTurno(''); }}>Cancelar</Button>
-              <Button onClick={handleBooking} disabled={!selectedTurno || loading}>
-                {loading ? <Loader2 className="spin" size={18} /> : 'Confirmar reserva'}
-              </Button>
+          <div className="modal-content ticket-modal">
+            <div className="ticket-container">
+              
+              {/* Cabecera del ticket */}
+              <div className="ticket-header">
+                <h3>
+                  <Ticket size={24} color="#ffffff" />
+                  Ticket de Reserva
+                </h3>
+              </div>
+
+              {/* Cuerpo del ticket con la información */}
+              <div className="ticket-body">
+                <div className="ticket-info-row">
+                  <span className="ticket-label">Escritorio</span>
+                  <span className="ticket-value">#{bookingDesk}</span>
+                </div>
+                <div className="ticket-info-row">
+                  <span className="ticket-label">Fecha</span>
+                  <span className="ticket-value">{selectedDate}</span>
+                </div>
+
+                <div className="ticket-select-group">
+                  <span className="ticket-label">Horario</span>
+                  <select 
+                    value={selectedTurno} 
+                    onChange={e => setSelectedTurno(e.target.value)} 
+                    className="ticket-select"
+                  >
+                    <option value="">Selecciona un turno...</option>
+                    {horarios.map(h => {
+                      // Mantenemos el formato de hora limpio (HH:mm)
+                      const inicio = h.attributes?.inicio?.slice(0, 5) || h.inicio?.slice(0,5) || '--:--';
+                      const fin = h.attributes?.fin?.slice(0, 5) || h.fin?.slice(0,5) || '--:--';
+                      return (
+                        <option key={h.id} value={h.id} disabled={!isAvail(bookingDesk, h.id)}>
+                          {inicio} - {fin}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
+
+              {/* Separador visual troquelado */}
+              <div className="ticket-divider">
+                <div className="ticket-divider-line"></div>
+              </div>
+
+              {/* Pie del ticket con botones */}
+              <div className="ticket-footer">
+                <div className="ticket-actions">
+                  <Button 
+                    variant="secondary" 
+                    onClick={() => { setBookingDesk(null); setSelectedTurno(''); }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleBooking} disabled={!selectedTurno || loading}>
+                    {loading ? <Loader2 className="spin" size={18} /> : 'Confirmar'}
+                  </Button>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

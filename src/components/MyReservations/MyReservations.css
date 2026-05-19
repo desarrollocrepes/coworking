@@ -98,7 +98,6 @@
   font-size: 1.25rem;
 }
 
-/* --- CLASES NUEVAS PARA LOS FILTROS --- */
 .filters-bar-reservations {
   display: flex;
   flex-wrap: wrap;
@@ -126,7 +125,6 @@
 .filter-input:focus, .filter-select:focus {
   border-color: var(--primary);
 }
-/* -------------------------------------- */
 
 .table-wrapper {
   overflow-x: auto;
@@ -191,6 +189,34 @@
 .action-btn:hover {
   background: var(--primary-light);
 }
+
+/* Nuevas clases para cancelar y paginación */
+.action-btn.cancel-btn {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.action-btn.cancel-btn:hover {
+  background: var(--danger-light);
+  color: #991b1b;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  background: white;
+}
+
+.pagination-controls .action-btn:disabled {
+  border-color: #ccc;
+  color: #ccc;
+  cursor: not-allowed;
+  background: transparent;
+}
+
 @media (min-width: 1024px) {
   .reservations-layout {
     flex-direction: row;

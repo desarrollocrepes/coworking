@@ -94,7 +94,7 @@
   width: 6rem;
   height: 6rem;
   object-fit: contain;
-  background-color: yellow;
+  border: 1px solid red;
 }
 
 .desk-node {
@@ -178,4 +178,148 @@
   }
   .hidden-mobile { display: flex !important; } /* Siempre visible en escritorio */
   .toggle-icon-mobile { display: none; }
+}
+
+/* --- ESTILOS DEL MODAL TIPO TICKET --- */
+
+/* Resetea el padding del modal original para que el ticket lo cubra todo */
+.modal-content.ticket-modal {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: none !important;
+}
+
+.ticket-container {
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.ticket-header {
+  background: var(--primary, #8b5e3c);
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+.ticket-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 1.4rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.ticket-body {
+  padding: 1.5rem;
+  background: #fdfbf7; /* Tono crema muy sutil */
+  font-family: 'Poppins', sans-serif;
+}
+
+.ticket-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px dashed #e0d8c8;
+  padding-bottom: 0.5rem;
+}
+
+.ticket-label {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.ticket-value {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.ticket-select-group {
+  margin-top: 1.5rem;
+}
+
+.ticket-select-group .ticket-label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.ticket-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e0d8c8;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  font-family: inherit;
+  color: var(--text-main);
+  outline: none;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.ticket-select:focus {
+  border-color: var(--primary, #8b5e3c);
+}
+
+/* Efecto del troquelado del ticket */
+.ticket-divider {
+  position: relative;
+  height: 30px;
+  background: #fdfbf7;
+}
+
+/* Círculos laterales simulando el corte (mismo color oscuro que el overlay de fondo) */
+.ticket-divider::before,
+.ticket-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 25px;
+  height: 25px;
+  background-color: #503629; /* Color típico de un .modal-overlay */
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.ticket-divider::before {
+  left: -12.5px;
+}
+
+.ticket-divider::after {
+  right: -12.5px;
+}
+
+.ticket-divider-line {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  right: 20px;
+  border-top: 2px dashed #d4cbb8;
+  transform: translateY(-50%);
+}
+
+.ticket-footer {
+  padding: 1.5rem;
+  background: #fdfbf7;
+}
+
+.ticket-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.ticket-actions button {
+  flex: 1;
 }
