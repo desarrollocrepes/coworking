@@ -3,8 +3,7 @@ import { MapPin, MapPinOff, RefreshCw, CheckCircle, Loader2 } from 'lucide-react
 import Button from '../Shared/Button';
 import './MyReservations.css';
 
-// 1. Configuración de geolocalización (Reemplaza con las de tu oficina)
-const COORDENADAS_OFICINA = { lat: 4.60971, lng: -74.08175 }; 
+const COORDENADAS_OFICINA = { lat: 4.745032296906609, lng: -74.04433727482517 };
 const RADIO_PERMITIDO_METROS = 1000;
 
 const calcularDistancia = (lat1, lon1, lat2, lon2) => {
