@@ -149,7 +149,7 @@ const MyReservations = ({ userData }) => {
       const date = new Date();
       const dateStr = date.toLocaleDateString('es-ES');
       const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-      finalReason = `${userData.name} eliminó este registro el ${dateStr} a las ${timeStr}. Motivo: ${cancelReason}`;
+      finalReason = `${userData.name} canceló este registro el ${dateStr} a las ${timeStr}. Motivo: ${cancelReason}`;
     }
 
     try {

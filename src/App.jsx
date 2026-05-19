@@ -81,8 +81,8 @@ export default function CoworkingApp() {
       {showLogoutModal && (
         <div className="modal-overlay" style={{zIndex: 100}}>
           <div className="modal-content">
-            <h3 style={{color: 'var(--danger)', margin:'0 0 1rem', display:'flex', alignItems:'center', gap:'0.5rem'}}>¿Cerrar Sesión?</h3>
-            <p style={{marginBottom:'1.5rem', color: 'var(--text-muted)'}}>¿Estás seguro de que deseas salir de tu sesión actual?</p>
+            <h3 style={{color: 'var(--danger)', display:'flex', alignItems:'center'}}>¿Cerrar Sesión?</h3>
+            <p style={{color: 'var(--text-muted)'}}>¿Estás seguro de que deseas salir de tu sesión actual?</p>
             <div className="modal-actions">
               <Button variant="secondary" onClick={() => setShowLogoutModal(false)}>Cancelar</Button>
               <Button variant="danger" onClick={handleLogout}>Sí, salir</Button>
