@@ -7,7 +7,7 @@ import chair2Img from '../../assets/chairs/chair2.png';
 import chair3Img from '../../assets/chairs/chair3.png';
 import './DeskSelection.css';
 
-const API = 'https://macfer.crepesywaffles.com/api';
+const API = '${import.meta.env.VITE_API_BASE_URL}/api';
 const DESKS_MONITOR = [1, 3, 6];
 const desks = [1, 2, 3, 4, 5, 6];
 

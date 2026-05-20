@@ -3,7 +3,7 @@ import { Loader2, IdCard, Briefcase } from 'lucide-react';
 import Button from '../Shared/Button';
 import './Login.css';
 
-const ADMIN_CEDULAS = ["39792291", "52208899", "52932934", "1082244170", "1020759405", "1013106465", "1031610302"];
+const ADMIN_CEDULAS = import.meta.env.VITE_ADMIN_CEDULAS ? import.meta.env.VITE_ADMIN_CEDULAS.split(',') : [];
 
 const Login = ({ onLoginSuccess }) => {
   const [cedula, setCedula] = useState('');
@@ -19,7 +19,7 @@ const Login = ({ onLoginSuccess }) => {
     setErrorMsg('');
 
     try {
-      const res = await fetch(`https://apialohav2.crepesywaffles.com/buk/empleados3?documento=${cleanCedula}`);
+      const res = await fetch(`${import.meta.env.VITE_API_ALOHA_URL}/buk/empleados3?documento=${cleanCedula}`);
       const data = await res.json();
       const emp = Array.isArray(data) ? data[0] : (data?.data?.[0] || data?.data || data);
 
@@ -37,7 +37,7 @@ const Login = ({ onLoginSuccess }) => {
 
       let accepted = false;
       try {
-        const polRes = await fetch(`https://macfer.crepesywaffles.com/api/working-politicas?documento=${cleanCedula}`);
+        const polRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/working-politicas?documento=${cleanCedula}`);
         const polData = await polRes.json();
         accepted = polData?.aceptadas === true || (Array.isArray(polData) && polData.length > 0);
       } catch { /* Ignorar error de políticas */ }

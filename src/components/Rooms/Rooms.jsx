@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Monitor, ChevronRight, Loader2, Armchair } from 'lucide-react';
 import './Rooms.css';
 
-const BASE = 'https://macfer.crepesywaffles.com';
+const BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function Rooms({ onSelectRoom }) {
   const [{ salas, loading, err }, setState] = useState({ salas: [], loading: true, err: '' });

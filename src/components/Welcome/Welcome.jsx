@@ -3,7 +3,7 @@ import { CheckCircle, RefreshCw, Calendar, MapPin, MapPinOff, Loader2, ChevronLe
 import Button from '../Shared/Button';
 import './Welcome.css';
 
-const API_URL = 'https://macfer.crepesywaffles.com/api/working-politicas';
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/working-politicas`;
 
 const Welcome = ({ userData, policiesAccepted, onAcceptPolicies, onContinue }) => {
   const [loading, setLoading] = useState(false);

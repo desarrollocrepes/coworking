@@ -3,8 +3,11 @@ import { MapPin, MapPinOff, RefreshCw, CheckCircle, Loader2 } from 'lucide-react
 import Button from '../Shared/Button';
 import './MyReservations.css';
 
-const COORDENADAS_OFICINA = { lat: 4.745032296906609, lng: -74.04433727482517 };
-const RADIO_PERMITIDO_METROS = 1000;
+const COORDENADAS_OFICINA = { 
+  lat: Number(import.meta.env.VITE_OFFICE_LAT), 
+  lng: Number(import.meta.env.VITE_OFFICE_LNG) 
+};
+const RADIO_PERMITIDO_METROS = Number(import.meta.env.VITE_OFFICE_RADIUS);
 
 const calcularDistancia = (lat1, lon1, lat2, lon2) => {
   const R = 6371e3; 
@@ -45,7 +48,7 @@ const MyReservations = ({ userData }) => {
     setLoading(true); 
     setErrorMsg('');
     try {
-      const baseUrl = 'https://macfer.crepesywaffles.com/api/working-reservas';
+      const baseUrl = '${import.meta.env.VITE_API_BASE_URL}/api/working-reservas';
       const url = userData?.isAdmin 
         ? `${baseUrl}?populate=*` 
         : `${baseUrl}?filters[documento][$eq]=${userData?.cedula}&populate=*`;
@@ -121,7 +124,7 @@ const MyReservations = ({ userData }) => {
 
     setLoading(true);
     try {
-      const url = `https://macfer.crepesywaffles.com/api/working-reservas/${reservaId}`;
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/working-reservas/${reservaId}`;
       const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -153,7 +156,7 @@ const MyReservations = ({ userData }) => {
     }
 
     try {
-      const url = `https://macfer.crepesywaffles.com/api/working-reservas/${cancelModal.reservaId}`;
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/working-reservas/${reservaId}`;
       const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -196,7 +199,7 @@ const MyReservations = ({ userData }) => {
 
     setLoading(true);
     try {
-      const url = `https://macfer.crepesywaffles.com/api/working-reservas/${reserva.id}`;
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/working-reservas/${reservaId}`;
       const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
