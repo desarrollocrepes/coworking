@@ -48,10 +48,12 @@ const MyReservations = ({ userData }) => {
     setLoading(true); 
     setErrorMsg('');
     try {
-      const baseUrl = '${import.meta.env.VITE_API_BASE_URL}/api/working-reservas';
+      const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/api/working-reservas`;
       const url = userData?.isAdmin 
         ? `${baseUrl}?populate=*` 
         : `${baseUrl}?filters[documento][$eq]=${userData?.cedula}&populate=*`;
+
+      console.log("URL que se está llamando:", url);
         
       const res = await fetch(url);
       if(!res.ok) throw new Error('Error al cargar reservas');
@@ -199,7 +201,7 @@ const MyReservations = ({ userData }) => {
 
     setLoading(true);
     try {
-      const url = `${import.meta.env.VITE_API_BASE_URL}/api/working-reservas/${reservaId}`;
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/working-reservas/${reserva.id}`;
       const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

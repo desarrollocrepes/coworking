@@ -9,6 +9,8 @@ import Rooms from './components/Rooms/Rooms';
 import DeskSelection from './components/DeskSelection/DeskSelection';
 import MyReservations from './components/MyReservations/MyReservations';
 
+console.log("Variables de entorno cargadas:", import.meta.env);
+
 export default function CoworkingApp() {
   const [currentView, setCurrentView] = useState('login'); 
   const [userData, setUserData] = useState(null);
