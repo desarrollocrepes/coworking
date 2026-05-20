@@ -160,7 +160,6 @@
   font-size: 0.95rem;
 }
 
-/* Nuevas clases para comportamiento en móviles del sidebar */
 .hidden-mobile { display: none !important; }
 .toggle-icon-mobile { display: block; font-size: 0.8rem; }
 
