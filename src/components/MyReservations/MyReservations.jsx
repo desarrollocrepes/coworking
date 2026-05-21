@@ -158,7 +158,7 @@ const MyReservations = ({ userData }) => {
     }
 
     try {
-      const url = `${import.meta.env.VITE_API_BASE_URL}/api/working-reservas/${reservaId}`;
+      const url = `${import.meta.env.VITE_API_BASE_URL}/api/working-reservas/${cancelModal.reservaId}`;
       const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -265,7 +265,7 @@ const MyReservations = ({ userData }) => {
       {cancelModal.isOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Cancelar Reserva</h3>
+            <h3>Cancelar reserva</h3>
             <p>Por favor, indica el motivo de la cancelación:</p>
             <textarea 
               value={cancelReason} 
@@ -333,7 +333,7 @@ const MyReservations = ({ userData }) => {
            <div className="filters-bar-reservations">
              <input 
                type="text" 
-               placeholder="Buscar por ID, nombre o identificación..." 
+               placeholder="Buscar por ID de reserva, nombre o identificación..."
                value={searchTerm} 
                onChange={(e) => setSearchTerm(e.target.value)} 
                className="filter-input"
@@ -401,7 +401,7 @@ const MyReservations = ({ userData }) => {
                        <td style={{color: 'var(--text-muted)', fontSize: '0.85rem'}}>{attr.motivo_cancelacion || 'Ninguno'}</td>
                        <td>
                          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                           {/* Confirmar: Si es nula (Pendiente). Administradores siempre, Usuarios dentro de rango */}
+                           
                            {attr.estado === null && (
                              <button 
                                className="action-btn confirm-btn"
@@ -419,15 +419,15 @@ const MyReservations = ({ userData }) => {
 
                            {/* Cancelar: Si no está cancelada, en cualquier momento */}
                            {attr.estado !== false && (
-                             <button 
+                              <button 
                                className="action-btn cancel-btn"
                                onClick={() => {
                                  setCancelReason('');
                                  setCancelModal({ isOpen: true, reservaId: reserva.id });
                                }}
-                             >
+                              >
                                Cancelar
-                             </button>
+                              </button>
                            )}
 
                            {/* Reactivar: Solo Admins si el estado es cancelado (false) */}
@@ -445,7 +445,7 @@ const MyReservations = ({ userData }) => {
                      </tr>
                    );
                  })}
-                 {!loading && filteredReservas.length === 0 && <tr><td colSpan={userData?.isAdmin ? "8" : "7"} style={{textAlign: 'center', padding: '3rem'}}>No hay reservas.</td></tr>}
+                 {!loading && filteredReservas.length === 0 && <tr><td colSpan={userData?.isAdmin ? "8" : "7"} style={{textAlign: 'center', padding: '3rem'}}>No hay reservas</td></tr>}
                </tbody>
              </table>
            </div>

@@ -25,7 +25,14 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
   const [bookingDesk, setBookingDesk] = useState(null);
   const [selectedTurno, setSelectedTurno] = useState('');
   const [lastUserDesk, setLastUserDesk] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Nuevo estado para móviles
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const [simulatedDateTime, setSimulatedDateTime] = useState(''); //SIMULADOR DE TIEMPO TEMPORAL
+  const getNow = () => simulatedDateTime ? new Date(simulatedDateTime) : new Date();
+  const now = getNow();
+
+  const isMorning1 = now.getHours() >= 0 && now.getHours() < 5;
+  const todayStr = now.toISOString().split('T')[0];
 
   const docId = userData?.cedula || userData?.documento;
   const isMorning = new Date().getHours() >= 0 && new Date().getHours() < 5;
@@ -33,7 +40,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      let dts = [], i = 0, d = new Date();
+      let dts = [], i = 0, d = new Date(); // modificar let dts = [], i = 0, d = new Date();
       while (dts.length < 2 && i < (isMorning ? 2 : 7)) {
         let curr = new Date(d); curr.setDate(d.getDate() + i++);
         if (curr.getDay() !== 0 && curr.getDay() !== 6) dts.push(curr.toISOString().split('T')[0]);
@@ -47,7 +54,10 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
           fetch(`${API}/working-reservas?populate=*`).then(r => r.json())
         ]);
         setHorarios(hRes.data || []);
-        const userR = rRes.data.filter(r => r.attributes?.documento === docId && r.attributes?.estado);
+        const userR = rRes.data.filter(r => 
+          r.attributes?.documento === docId && 
+          (r.attributes?.estado === true || r.attributes?.estado === null)
+        );
         if (userR.length) setLastUserDesk(getDeskId(userR[userR.length - 1]));
       } catch { setErrorMsg('Error al cargar inicial'); }
       setLoading(false);
@@ -60,7 +70,10 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
     setLoading(true);
     fetch(`${API}/working-reservas?populate=*`)
       .then(r => r.json())
-      .then(d => setReservas(d.data.filter(r => (r.attributes?.fecha_reserva || r.attributes?.fecha) === selectedDate && r.attributes?.estado)))
+      .then(d => setReservas(d.data.filter(r => 
+        (r.attributes?.fecha_reserva || r.attributes?.fecha) === selectedDate && 
+        (r.attributes?.estado === true || r.attributes?.estado === null)
+      )))
       .catch(() => setErrorMsg('Error al cargar reservas'))
       .finally(() => setLoading(false));
   }, [selectedDate, docId]);
@@ -77,18 +90,22 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
   };
 
   const handleBooking = async () => {
-    if (!selectedTurno || !bookingDesk) return setErrorMsg('Selecciona escritorio y turno.');
-    if (!canSelect(bookingDesk)) return setErrorMsg(`Rotación: No puedes usar el escritorio ${lastUserDesk} de nuevo.`);
-    if (reservas.some(r => r.attributes?.documento === docId && r.attributes?.estado)) return setErrorMsg('Una reserva por día.');
-    if (!isAvail(bookingDesk, parseInt(selectedTurno))) return setErrorMsg('Escritorio no disponible.');
+    if (!selectedTurno || !bookingDesk) return setErrorMsg('Selecciona escritorio y turno');
+    if (!canSelect(bookingDesk)) return setErrorMsg(`Rotación: No puedes usar el escritorio ${lastUserDesk} de nuevo`);
+    if (reservas.some(r => r.attributes?.documento === docId && r.attributes?.estado)) return setErrorMsg('Una reserva por día');
+    if (!isAvail(bookingDesk, parseInt(selectedTurno))) return setErrorMsg('Escritorio no disponible');
 
     setLoading(true); setErrorMsg('');
     try {
       for (let i = 0; i < 3; i++) {
         const { data } = await fetch(`${API}/working-reservas?populate=*`).then(r => r.json());
-        const dr = data.filter(r => getDeskId(r) === bookingDesk && r.attributes?.fecha_reserva === selectedDate);
+        const dr = data.filter(r => 
+          getDeskId(r) === bookingDesk && 
+          r.attributes?.fecha_reserva === selectedDate && 
+          (r.attributes?.estado === true || r.attributes?.estado === null)
+        );
         if (dr.some(r => getTurnoId(r) === 3 || getTurnoId(r) == selectedTurno) || (selectedTurno == 3 && dr.length))
-          throw new Error('El escritorio fue reservado mientras confirmabas.');
+          throw new Error('El escritorio fue reservado mientras confirmabas');
       }
 
       const res = await fetch(`${API}/working-reservas`, {
@@ -96,7 +113,7 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` },
         body: JSON.stringify({ data: {
           Nombre: userData?.name || '', foto: userData?.photo || '', documento: docId || '', area: userData?.department || '',
-          fecha_reserva: selectedDate, estado: true, motivo_cancelacion: null,
+          fecha_reserva: selectedDate, estado: null, motivo_cancelacion: null,
           working_puestos: { connect: [bookingDesk] }, working_horarios: { connect: [parseInt(selectedTurno)] }
         }})
       });
@@ -215,25 +232,17 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
           <div className="modal-content ticket-modal">
             <div className="ticket-container">
               
-              {/* Cabecera del ticket */}
+              {/* tickeeeet */}
               <div className="ticket-header">
-                <h3>
+                <h3 style={{ color: "#ffffff" }}>
                   <Ticket size={24} color="#ffffff" />
-                  Ticket de Reserva
+                  Ticket de reserva
                 </h3>
               </div>
 
               {/* Cuerpo del ticket con la información */}
               <div className="ticket-body">
-                <div className="ticket-info-row">
-                  <span className="ticket-label">Escritorio</span>
-                  <span className="ticket-value">#{bookingDesk}</span>
-                </div>
-                <div className="ticket-info-row">
-                  <span className="ticket-label">Fecha</span>
-                  <span className="ticket-value">{selectedDate}</span>
-                </div>
-
+                {/* ... otros campos ... */}
                 <div className="ticket-select-group">
                   <span className="ticket-label">Horario</span>
                   <select 
@@ -243,12 +252,17 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                   >
                     <option value="">Selecciona un turno...</option>
                     {horarios.map(h => {
-                      // Mantenemos el formato de hora limpio (HH:mm)
                       const inicio = h.attributes?.inicio?.slice(0, 5) || h.inicio?.slice(0,5) || '--:--';
                       const fin = h.attributes?.fin?.slice(0, 5) || h.fin?.slice(0,5) || '--:--';
+                      
+                      // NUEVO: Lógica para bloquear turnos que ya pasaron HOY
+                      const inicioHour = parseInt(inicio.split(':')[0]); // Extrae la hora (ej. '08' -> 8)
+                      const isPastTurn = selectedDate === todayStr && now.getHours() >= inicioHour;
+
                       return (
-                        <option key={h.id} value={h.id} disabled={!isAvail(bookingDesk, h.id)}>
-                          {inicio} - {fin}
+                        // MODIFICADO: Deshabilita si no hay disponibilidad o si el turno ya pasó
+                        <option key={h.id} value={h.id} disabled={!isAvail(bookingDesk, h.id) || isPastTurn}>
+                          {inicio} - {fin} {isPastTurn ? '(Finalizado)' : ''}
                         </option>
                       );
                     })}
@@ -256,12 +270,6 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                 </div>
               </div>
 
-              {/* Separador visual troquelado */}
-              <div className="ticket-divider">
-                <div className="ticket-divider-line"></div>
-              </div>
-
-              {/* Pie del ticket con botones */}
               <div className="ticket-footer">
                 <div className="ticket-actions">
                   <Button 
@@ -275,11 +283,34 @@ const DeskSelection = ({ room, userData, onSuccess }) => {
                   </Button>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
       )}
+
+      {/* SIMULADOR DE TIEMPO (Solo para Fase Beta) */}
+      <div style={{
+        position: 'fixed', bottom: '20px', right: '20px', 
+        background: 'white', padding: '10px 15px', borderRadius: '8px', 
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 9999,
+        border: '1px solid var(--primary)', display: 'flex', flexDirection: 'column', gap: '5px'
+      }}>
+        <div style={{display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--primary)'}}>
+          <Clock size={16} /> Simulador de Tiempo Beta
+        </div>
+        <input 
+          type="datetime-local" 
+          value={simulatedDateTime} 
+          onChange={(e) => setSimulatedDateTime(e.target.value)}
+          style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '0.8rem' }}
+        />
+        <button 
+          onClick={() => setSimulatedDateTime('')}
+          style={{ background: '#f4f4f4', border: 'none', padding: '4px', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer' }}
+        >
+          Restablecer a Hora Real
+        </button>
+      </div>
     </>
   );
 };

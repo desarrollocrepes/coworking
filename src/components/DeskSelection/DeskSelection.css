@@ -218,24 +218,19 @@
 
 .ticket-body {
   padding: 1.5rem;
-  background: #fdfbf7; /* Tono crema muy sutil */
+  background: #fff;
   font-family: 'Poppins', sans-serif;
+  padding-bottom: 0;
 }
 
 .ticket-info-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
-  border-bottom: 1px dashed #e0d8c8;
-  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .ticket-label {
-  font-size: 0.8rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 500;
+  font-size: 1rem;
 }
 
 .ticket-value {
@@ -243,74 +238,21 @@
   color: var(--text-main);
 }
 
-.ticket-select-group {
-  margin-top: 1.5rem;
-}
-
-.ticket-select-group .ticket-label {
-  display: block;
-  margin-bottom: 0.5rem;
-}
-
 .ticket-select {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e0d8c8;
-  border-radius: 0.5rem;
-  background: #ffffff;
+  width: fit-content;
+  background: transparent;
   font-family: inherit;
   color: var(--text-main);
   outline: none;
-  font-size: 0.95rem;
-  transition: border-color 0.2s ease;
+  font-size: 1rem;
   cursor: pointer;
   appearance: auto;
-}
-
-.ticket-select:focus {
-  border-color: var(--primary, #8b5e3c);
-}
-
-/* Efecto del troquelado del ticket */
-.ticket-divider {
-  position: relative;
-  height: 30px;
-  background: #fdfbf7;
-}
-
-/* Círculos laterales simulando el corte (mismo color oscuro que el overlay de fondo) */
-.ticket-divider::before,
-.ticket-divider::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 25px;
-  height: 25px;
-  background-color: #503629; /* Color típico de un .modal-overlay */
-  border-radius: 50%;
-  transform: translateY(-50%);
-}
-
-.ticket-divider::before {
-  left: -12.5px;
-}
-
-.ticket-divider::after {
-  right: -12.5px;
-}
-
-.ticket-divider-line {
-  position: absolute;
-  top: 50%;
-  left: 20px;
-  right: 20px;
-  border-top: 2px dashed #d4cbb8;
-  transform: translateY(-50%);
+  font-weight: 600;
+  border: none;
 }
 
 .ticket-footer {
   padding: 1.5rem;
-  background: #fdfbf7;
 }
 
 .ticket-actions {
